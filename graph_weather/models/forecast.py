@@ -15,7 +15,7 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         lat_lons: list,
         resolution: int = 2,
         feature_dim: int = 78,
-        aux_dim: int = 24,
+        aux_dim: int = 0, #TODO change back to 24
         output_dim: Optional[int] = None,
         node_dim: int = 256,
         edge_dim: int = 256,

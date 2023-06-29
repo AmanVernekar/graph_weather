@@ -1,3 +1,4 @@
 .idea/
 *.nc
 pat.txt
+**/__pycache__
