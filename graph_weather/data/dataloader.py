@@ -11,7 +11,7 @@ The dataloader has to do a few things for the model to work correctly
 
 """
 
-import const
+from . import const
 import numpy as np
 import pandas as pd
 import xarray as xr
@@ -151,23 +151,23 @@ class AnalysisDataset(Dataset):
         return input_data, output_data
 
 
-obs_data = xr.open_zarr(
-    "/home/jacob/Development/prepbufr.gdas.20160101.t00z.nr.48h.raw.zarr", consolidated=True
-)
-# TODO Embedding? These should stay consistent across all of the inputs, so can just load the values, not the strings?
-# Should only take in the quality markers, observations, reported observation time relative to start point
-# Observation errors, and background values, lat/lon/height/speed of observing thing
-print(obs_data)
-print(obs_data.hdr_inst_typ.values)
-print(obs_data.hdr_irpt_typ.values)
-print(obs_data.obs_qty_table.values)
-print(obs_data.hdr_prpt_typ.values)
-print(obs_data.hdr_sid_table.values)
-print(obs_data.hdr_typ_table.values)
-print(obs_data.obs_desc.values)
-print(obs_data.data_vars.keys())
-exit()
-analysis_data = xr.open_zarr(
-    "/home/jacob/Development/gdas1.fnl0p25.2016010100.f00.zarr", consolidated=True
-)
-print(analysis_data)
+# obs_data = xr.open_zarr(
+#     "/home/jacob/Development/prepbufr.gdas.20160101.t00z.nr.48h.raw.zarr", consolidated=True
+# )
+# # TODO Embedding? These should stay consistent across all of the inputs, so can just load the values, not the strings?
+# # Should only take in the quality markers, observations, reported observation time relative to start point
+# # Observation errors, and background values, lat/lon/height/speed of observing thing
+# print(obs_data)
+# print(obs_data.hdr_inst_typ.values)
+# print(obs_data.hdr_irpt_typ.values)
+# print(obs_data.obs_qty_table.values)
+# print(obs_data.hdr_prpt_typ.values)
+# print(obs_data.hdr_sid_table.values)
+# print(obs_data.hdr_typ_table.values)
+# print(obs_data.obs_desc.values)
+# print(obs_data.data_vars.keys())
+# exit()
+# analysis_data = xr.open_zarr(
+#     "/home/jacob/Development/gdas1.fnl0p25.2016010100.f00.zarr", consolidated=True
+# )
+# print(analysis_data)
