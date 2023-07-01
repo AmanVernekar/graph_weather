@@ -1,6 +1,0 @@
-.idea/
-*.nc
-*.grib
-pat.txt
-**/__pycache__
-*.zarr
