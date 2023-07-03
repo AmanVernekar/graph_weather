@@ -52,21 +52,21 @@ class AnalysisDataset(Dataset):
             )
 
         # Land-sea mask data, resampled to the same as the physical variables
-        landsea = (
-            xr.open_zarr(self.invariant_path, consolidated=True)
-            .interp(latitude=start.latitude.values)
-            .interp(longitude=start.longitude.values)
-        )
-        # Calculate sin,cos, day of year, solar irradiance here before stacking
-        landsea = np.stack(
-            [
-                (landsea[f"{var}"].values - const.LANDSEA_MEAN[var]) / const.LANDSEA_STD[var]
-                for var in landsea.data_vars
-                if not np.isnan(landsea[f"{var}"].values).any()
-            ],
-            axis=-1,
-        )
-        landsea = landsea.T.reshape((-1, landsea.shape[-1]))
+        # landsea = (
+        #     xr.open_zarr(self.invariant_path, consolidated=True)
+        #     .interp(latitude=start.latitude.values)
+        #     .interp(longitude=start.longitude.values)
+        # )
+        # # Calculate sin,cos, day of year, solar irradiance here before stacking
+        # landsea = np.stack(
+        #     [
+        #         (landsea[f"{var}"].values - const.LANDSEA_MEAN[var]) / const.LANDSEA_STD[var]
+        #         for var in landsea.data_vars
+        #         if not np.isnan(landsea[f"{var}"].values).any()
+        #     ],
+        #     axis=-1,
+        # )
+        # landsea = landsea.T.reshape((-1, landsea.shape[-1]))
         lat_lons = np.array(np.meshgrid(start.latitude.values, start.longitude.values)).T.reshape(
             (-1, 2)
         )
@@ -120,10 +120,9 @@ class AnalysisDataset(Dataset):
                 sin_lat_lons,
                 cos_lat_lons,
                 solar_times,
-                landsea,
             ],
             axis=-1,
-        )
+        ) # removed landsea
         # Not want to predict non-physics variables -> Output only the data variables? Would be simpler, and just add in the new ones each time
 
         output_data = np.stack(
@@ -141,10 +140,9 @@ class AnalysisDataset(Dataset):
                 sin_lat_lons,
                 cos_lat_lons,
                 end_solar_times,
-                landsea,
             ],
             axis=-1,
-        )
+        ) # removed landsea
         # Stick with Numpy, don't tensor it, as just going from 0 to 1
 
         # Normalize now
