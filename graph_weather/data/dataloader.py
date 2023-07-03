@@ -72,8 +72,8 @@ class AnalysisDataset(Dataset):
         )
         sin_lat_lons = np.sin(lat_lons)
         cos_lat_lons = np.cos(lat_lons)
-        date = start.time.dt.values
-        day_of_year = start.time.dayofyear.values / 365.0
+        date = start.time.dt.date
+        day_of_year = start.time.dt.dayofyear / 365.0
         np.sin(day_of_year)
         np.cos(day_of_year)
         solar_times = [np.array([extraterrestrial_irrad(date, lat, lon) for lat, lon in lat_lons])]
@@ -86,7 +86,7 @@ class AnalysisDataset(Dataset):
         solar_times = np.array(solar_times)
 
         # End time solar radiation too
-        end_date = end.time.dt.values
+        end_date = end.time.dt.date
         end_solar_times = [
             np.array([extraterrestrial_irrad(end_date, lat, lon) for lat, lon in lat_lons])
         ]
