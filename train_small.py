@@ -1,5 +1,5 @@
 #from __future__ import absolute_import
-from graph_weather import AnalysisDataset
+from graph_weather import AnalysisDataset, GraphWeatherForecaster
 
 ds = AnalysisDataset(['/local/scratch-2/asv34/graph_weather/20220101.zarr.zip', '/local/scratch-2/asv34/graph_weather/20220102.zarr.zip'], '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, 1)
 print(ds[0])

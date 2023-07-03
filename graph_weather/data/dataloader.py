@@ -109,11 +109,11 @@ class AnalysisDataset(Dataset):
             [
                 start[f"{var}"].values
                 for var in start.data_vars
-                if not np.isnan(start[f"{var}"].values).any()
             ],
             axis=-1,
-        )
+        ) #if not np.isnan(start[f"{var}"].values).any()
         # TODO Combine with above? And include sin/cos of day of year
+        print("hi")
         input_data = np.concatenate(
             [
                 input_data.T.reshape((-1, input_data.shape[-1])),
