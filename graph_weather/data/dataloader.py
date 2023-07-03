@@ -76,33 +76,33 @@ class AnalysisDataset(Dataset):
         day_of_year = start.time.dt.dayofyear / 365.0
         np.sin(day_of_year)
         np.cos(day_of_year)
-        solar_times = [np.array([extraterrestrial_irrad(date, lat, lon) for lat, lon in lat_lons])]
-        for when in pd.date_range(
-            date - pd.Timedelta("12 hours"), date + pd.Timedelta("12 hours"), freq="1H"
-        ):
-            solar_times.append(
-                np.array([extraterrestrial_irrad(when, lat, lon) for lat, lon in lat_lons])
-            )
-        solar_times = np.array(solar_times)
+        # solar_times = [np.array([extraterrestrial_irrad(date, lat, lon) for lat, lon in lat_lons])]
+        # for when in pd.date_range(
+        #     date - pd.Timedelta("12 hours"), date + pd.Timedelta("12 hours"), freq="1H"
+        # ):
+        #     solar_times.append(
+        #         np.array([extraterrestrial_irrad(when, lat, lon) for lat, lon in lat_lons])
+        #     )
+        # solar_times = np.array(solar_times)
 
         # End time solar radiation too
         end_date = end.time.dt.date
-        end_solar_times = [
-            np.array([extraterrestrial_irrad(end_date, lat, lon) for lat, lon in lat_lons])
-        ]
-        for when in pd.date_range(
-            end_date - pd.Timedelta("12 hours"), end_date + pd.Timedelta("12 hours"), freq="1H"
-        ):
-            end_solar_times.append(
-                np.array([extraterrestrial_irrad(when, lat, lon) for lat, lon in lat_lons])
-            )
-        end_solar_times = np.array(solar_times)
+        # end_solar_times = [
+        #     np.array([extraterrestrial_irrad(end_date, lat, lon) for lat, lon in lat_lons])
+        # ]
+        # for when in pd.date_range(
+        #     end_date - pd.Timedelta("12 hours"), end_date + pd.Timedelta("12 hours"), freq="1H"
+        # ):
+        #     end_solar_times.append(
+        #         np.array([extraterrestrial_irrad(when, lat, lon) for lat, lon in lat_lons])
+        #     )
+        # end_solar_times = np.array(solar_times)
 
-        # Normalize to between -1 and 1
-        solar_times -= const.SOLAR_MEAN
-        solar_times /= const.SOLAR_STD
-        end_solar_times -= const.SOLAR_MEAN
-        end_solar_times /= const.SOLAR_STD
+        # # Normalize to between -1 and 1
+        # solar_times -= const.SOLAR_MEAN
+        # solar_times /= const.SOLAR_STD
+        # end_solar_times -= const.SOLAR_MEAN
+        # end_solar_times /= const.SOLAR_STD
 
         # Stack the data into a large data cube
         input_data = np.stack(
@@ -118,11 +118,10 @@ class AnalysisDataset(Dataset):
             [
                 input_data.T.reshape((-1, input_data.shape[-1])),
                 sin_lat_lons,
-                cos_lat_lons,
-                solar_times,
+                cos_lat_lons
             ],
             axis=-1,
-        ) # removed landsea
+        ) # removed landsea and solar_times
         # Not want to predict non-physics variables -> Output only the data variables? Would be simpler, and just add in the new ones each time
 
         output_data = np.stack(
@@ -138,11 +137,10 @@ class AnalysisDataset(Dataset):
             [
                 output_data.T.reshape((-1, output_data.shape[-1])),
                 sin_lat_lons,
-                cos_lat_lons,
-                end_solar_times,
+                cos_lat_lons
             ],
             axis=-1,
-        ) # removed landsea
+        ) # removed landsea and end_solar_times
         # Stick with Numpy, don't tensor it, as just going from 0 to 1
 
         # Normalize now
