@@ -34,6 +34,7 @@ class AnalysisDataset(Dataset):
     def __getitem__(self, item):
         if self.coarsen <= 1:  # Don't coarsen, so don't even call it
             start = xr.open_zarr(self.filepaths[item], consolidated=True)
+            print(start.shape)
             end = xr.open_zarr(self.filepaths[item + 1], consolidated=True)
         else:
             start = (
