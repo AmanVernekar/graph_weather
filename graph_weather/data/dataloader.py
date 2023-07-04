@@ -105,16 +105,17 @@ class AnalysisDataset(Dataset):
         # end_solar_times /= const.SOLAR_STD
 
         # Stack the data into a large data cube
-        # input_data = np.stack(
-        #     [
-        #         start[f"{var}"].values
-        #         for var in start.data_vars
-        #     ],
-        #     axis=-1,
-        # ) #if not np.isnan(start[f"{var}"].values).any()
+        input_data = np.stack(
+            [
+                start[f"{var}"].values
+                for var in start.data_vars[:2]
+                if not np.isnan(start[f"{var}"].values).any()
+            ],
+            axis=-1,
+        ) 
 
-        input_data = pd.DataFrame([start[f"{var}"].valuesfor var in start.data_vars])
-        input_data = input_data.stack()
+        # input_data = pd.DataFrame([start[f"{var}"].values for var in start.data_vars])
+        # input_data = input_data.stack()
 
         # TODO Combine with above? And include sin/cos of day of year
         print("hi")
