@@ -105,13 +105,17 @@ class AnalysisDataset(Dataset):
         # end_solar_times /= const.SOLAR_STD
 
         # Stack the data into a large data cube
-        input_data = np.stack(
-            [
-                start[f"{var}"].values
-                for var in start.data_vars
-            ],
-            axis=-1,
-        ) #if not np.isnan(start[f"{var}"].values).any()
+        # input_data = np.stack(
+        #     [
+        #         start[f"{var}"].values
+        #         for var in start.data_vars
+        #     ],
+        #     axis=-1,
+        # ) #if not np.isnan(start[f"{var}"].values).any()
+
+        input_data = pd.DataFrame([start[f"{var}"].valuesfor var in start.data_vars])
+        input_data = input_data.stack()
+
         # TODO Combine with above? And include sin/cos of day of year
         print("hi")
         input_data = np.concatenate(
@@ -123,7 +127,7 @@ class AnalysisDataset(Dataset):
             axis=-1,
         ) # removed landsea and solar_times
         # Not want to predict non-physics variables -> Output only the data variables? Would be simpler, and just add in the new ones each time
-
+        print("hi again")
         output_data = np.stack(
             [
                 end[f"{var}"].values
