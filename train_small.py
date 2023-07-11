@@ -16,7 +16,7 @@ data = xr.open_zarr(filepaths[0], consolidated=True)
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
 device = torch.device("cuda:5" if torch.cuda.is_available() else "cpu")
 # Get the variance of the variables
-criterion = NormalizedMSELoss(lat_lons=lat_lons, device=device).to(device)
+criterion = NormalizedMSELoss(lat_lons=lat_lons, feature_variance=[1,1], device=device).to(device)
 means = []
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
 model = GraphWeatherForecaster(lat_lons, feature_dim=597, num_blocks=6).to(device)
