@@ -105,12 +105,10 @@ class AnalysisDataset(Dataset):
         # end_solar_times /= const.SOLAR_STD
 
         # Stack the data into a large data cube
-        print(start.data_vars)
         input_data = np.stack(
             [
                 start[f"{var}"].values
-                for var in start.data_vars
-                if not np.isnan(start[f"{var}"].values).any()
+                for var in ['t', 'z', 'q', 'u', 'v', 'w']
             ],
             axis=-1,
         ) 
