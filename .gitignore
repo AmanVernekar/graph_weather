@@ -5,3 +5,4 @@ pat.txt
 **/__pycache__
 *.zarr
 *.zip
+dataset/
