@@ -120,6 +120,7 @@ class AnalysisDataset(Dataset):
         # print("hi")
         # print(input_data.shape)
         
+        input_data = input_data[0]
         input_data = input_data.T.reshape((-1, input_data.shape[-1]))
         
         # print(a.shape)
@@ -141,6 +142,7 @@ class AnalysisDataset(Dataset):
             axis=-1,
         )
 
+        output_data = output_data[0]
         output_data = output_data.T.reshape((-1, output_data.shape[-1]))
 
         # output_data = np.concatenate(
