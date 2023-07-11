@@ -117,37 +117,40 @@ class AnalysisDataset(Dataset):
         # input_data = input_data.stack()
 
         # TODO Combine with above? And include sin/cos of day of year
-        print("hi")
-        print(input_data.shape)
-        a = input_data.T.reshape((-1, input_data.shape[-1]))
-        print(a.shape)
-        input_data = np.concatenate(
-            [
-                a,
-                sin_lat_lons,
-                cos_lat_lons
-            ],
-            axis=-1,
-        ) # removed landsea and solar_times
-        # Not want to predict non-physics variables -> Output only the data variables? Would be simpler, and just add in the new ones each time
-        print("hi again")
+        # print("hi")
+        # print(input_data.shape)
+        
+        input_data = input_data.T.reshape((-1, input_data.shape[-1]))
+        
+        # print(a.shape)
+        # input_data = np.concatenate(
+        #     [
+        #         a,
+        #         sin_lat_lons,
+        #         cos_lat_lons
+        #     ],
+        #     axis=0,
+        # ) # removed landsea and solar_times
+        # # Not want to predict non-physics variables -> Output only the data variables? Would be simpler, and just add in the new ones each time
+        # print("hi again")
         output_data = np.stack(
             [
                 end[f"{var}"].values
-                for var in end.data_vars
-                if not np.isnan(end[f"{var}"].values).any()
+                for var in ['t', 'z', 'q', 'u', 'v', 'w']
             ],
             axis=-1,
         )
 
-        output_data = np.concatenate(
-            [
-                output_data.T.reshape((-1, output_data.shape[-1])),
-                sin_lat_lons,
-                cos_lat_lons
-            ],
-            axis=-1,
-        ) # removed landsea and end_solar_times
+        output_data = output_data.T.reshape((-1, output_data.shape[-1]))
+
+        # output_data = np.concatenate(
+        #     [
+        #         output_data.T.reshape((-1, output_data.shape[-1])),
+        #         sin_lat_lons,
+        #         cos_lat_lons
+        #     ],
+        #     axis=-1,
+        # ) # removed landsea and end_solar_times
         # Stick with Numpy, don't tensor it, as just going from 0 to 1
 
         # Normalize now
