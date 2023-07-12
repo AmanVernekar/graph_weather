@@ -10,9 +10,10 @@ import torch.optim as optim
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
 
-ds = AnalysisDataset(filepaths, '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, 128)
+coarsen = 32
+ds = AnalysisDataset(filepaths, '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, coarsen)
 
-data = xr.open_zarr(filepaths[0], consolidated=True)
+data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
