@@ -21,7 +21,7 @@ class MLP(nn.Module):
         in_dim: int,
         out_dim: int = 64, #TODO: change all 64 back to 128
         hidden_dim: int = 64,
-        hidden_layers: int = 2,
+        hidden_layers: int = 1, #TODO: change all 1 hidden_layers back to 2
         norm_type: Optional[str] = "LayerNorm",
         use_checkpointing: bool = False,
     ):
@@ -91,7 +91,7 @@ class EdgeProcessor(nn.Module):
         in_dim_node: int = 64,
         in_dim_edge: int = 64,
         hidden_dim: int = 64,
-        hidden_layers: int = 2,
+        hidden_layers: int = 1,
         norm_type: str = "LayerNorm",
     ):
         """
@@ -144,7 +144,7 @@ class NodeProcessor(nn.Module):
         in_dim_node: int = 64,
         in_dim_edge: int = 64,
         hidden_dim: int = 64,
-        hidden_layers: int = 2,
+        hidden_layers: int = 1,
         norm_type: str = "LayerNorm",
     ):
         """
@@ -194,8 +194,8 @@ def build_graph_processor_block(
     in_dim_edge: int = 64,
     hidden_dim_node: int = 64,
     hidden_dim_edge: int = 64,
-    hidden_layers_node: int = 2,
-    hidden_layers_edge: int = 2,
+    hidden_layers_node: int = 1,
+    hidden_layers_edge: int = 1,
     norm_type: str = "LayerNorm",
 ) -> torch.nn.Module:
     """
@@ -229,13 +229,13 @@ class GraphProcessor(nn.Module):
 
     def __init__(
         self,
-        mp_iterations: int = 15,
+        mp_iterations: int = 5, #change back to 15
         in_dim_node: int = 64,
         in_dim_edge: int = 64,
         hidden_dim_node: int = 64,
         hidden_dim_edge: int = 64,
-        hidden_layers_node: int = 2,
-        hidden_layers_edge: int = 2,
+        hidden_layers_node: int = 1,
+        hidden_layers_edge: int = 1,
         norm_type: str = "LayerNorm",
     ):
         """

@@ -19,13 +19,13 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         output_dim: Optional[int] = None,
         node_dim: int = 64,
         edge_dim: int = 64,
-        num_blocks: int = 3,
+        num_blocks: int = 2, #change back to 3
         hidden_dim_processor_node: int = 64,
         hidden_dim_processor_edge: int = 64,
-        hidden_layers_processor_node: int = 2,
-        hidden_layers_processor_edge: int = 2,
+        hidden_layers_processor_node: int = 1, #change all 1 hidden layers back to 2
+        hidden_layers_processor_edge: int = 1,
         hidden_dim_decoder: int = 32,
-        hidden_layers_decoder: int = 2,
+        hidden_layers_decoder: int = 1,
         norm_type: str = "LayerNorm",
         use_checkpointing: bool = False,
     ):
