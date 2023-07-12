@@ -26,7 +26,8 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         hidden_layers_processor_edge: int = 1,
         hidden_dim_decoder: int = 32,
         hidden_layers_decoder: int = 1,
-        norm_type: str = "LayerNorm",
+        norm_type = None,
+        #norm_type: str = "LayerNorm",
         use_checkpointing: bool = False,
     ):
         """
