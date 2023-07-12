@@ -22,7 +22,7 @@ criterion = NormalizedMSELoss(lat_lons=lat_lons, feature_variance=[1,1], device=
 means = []
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
 model = GraphWeatherForecaster(lat_lons, num_blocks=2).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=0.001)
+optimizer = optim.AdamW(model.parameters(), lr=0.01)
 
 param_size = 0
 for param in model.parameters():
@@ -37,11 +37,13 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 import time
 
+loop_var = enumerate(dataset)
+
 for epoch in range(10):  # loop over the dataset multiple times
     running_loss = 0.0
     start = time.time()
     print(f"Start Epoch: {epoch}")
-    for i, data in enumerate(dataset):
+    for i, data in loop_var:
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
         print("loaded data")
