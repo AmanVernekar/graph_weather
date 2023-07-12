@@ -10,7 +10,7 @@ import torch.optim as optim
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
 
-ds = AnalysisDataset(filepaths, '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, 8)
+ds = AnalysisDataset(filepaths, '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, 128)
 
 data = xr.open_zarr(filepaths[0], consolidated=True)
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
