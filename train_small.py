@@ -21,8 +21,12 @@ print(device)
 criterion = NormalizedMSELoss(lat_lons=lat_lons, feature_variance=[1,1], device=device).to(device)
 means = []
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
+
+# train_dataset = dataset[:20]
+# test_dataset = dataset[20:]
+
 model = GraphWeatherForecaster(lat_lons, num_blocks=2).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=0.01)
+optimizer = optim.AdamW(model.parameters(), lr=0.1)
 
 param_size = 0
 for param in model.parameters():
@@ -37,13 +41,12 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 import time
 
-loop_var = enumerate(dataset)
-
 for epoch in range(10):  # loop over the dataset multiple times
     running_loss = 0.0
+    test_loss = 0.0
     start = time.time()
     print(f"Start Epoch: {epoch}")
-    for i, data in loop_var:
+    for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].to(device), data[1].to(device)
         print("loaded data")
@@ -52,17 +55,20 @@ for epoch in range(10):  # loop over the dataset multiple times
 
         # forward + backward + optimize
         outputs = model(inputs)
-        print("ran the model")
         loss = criterion(outputs, labels)
-        print("calculated loss")
-        loss.backward()
-        optimizer.step()
+        
+        if i < 20: # use first 20 for training and the rest for testing
+            loss.backward()
+            optimizer.step()
 
-        # print statistics
-        running_loss += loss.item()
-        end = time.time()
-        print(
-            f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / (i + 1):.3f} Time: {end - start} sec"
-        )
+            # print statistics
+            running_loss += loss.item()
+            end = time.time()
+            print(
+                f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / (i + 1):.3f} Time: {end - start} sec"
+            )
+        else:
+            test_loss += loss.item()
+    print(f"test loss after {epoch=} is {test_loss/4}.")
 
 print("Finished Training")
