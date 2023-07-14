@@ -6,3 +6,4 @@ pat.txt
 *.zarr
 *.zip
 dataset/
+output.txt
