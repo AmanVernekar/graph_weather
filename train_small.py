@@ -25,8 +25,8 @@ means = []
 # train_dataset = dataset[:20]
 # test_dataset = dataset[20:]
 
-model = GraphWeatherForecaster(lat_lons, num_blocks=2).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=0.1)
+model = GraphWeatherForecaster(lat_lons, num_blocks=3).to(device)
+optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
 param_size = 0
 for param in model.parameters():
@@ -41,15 +41,14 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 import time
 
-for epoch in range(10):  # loop over the dataset multiple times
+for epoch in range(1000):  # loop over the dataset multiple times
     running_loss = 0.0
     test_loss = 0.0
     start = time.time()
-    print(f"Start Epoch: {epoch}")
+    print(f"Start Epoch: {epoch+1}")
     for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
-        print("loaded data")
         # zero the parameter gradients
         optimizer.zero_grad()
 
@@ -69,6 +68,6 @@ for epoch in range(10):  # loop over the dataset multiple times
             )
         else:
             test_loss += loss.item()
-    print(f"test loss after {epoch=} is {test_loss/4}.")
+    print(f"test loss after epoch {epoch+1} is {test_loss/4}.")
 
 print("Finished Training")
