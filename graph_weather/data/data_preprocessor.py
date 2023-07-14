@@ -2,6 +2,10 @@ import glob
 import xarray as xr
 import numpy as np
 
+# import pandas as pd
+# from pysolar.util import extraterrestrial_irrad
+# from . import const
+
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
 filepaths = sorted(filepaths, key=lambda f : int(f[-11:-9]))
 
@@ -29,11 +33,12 @@ for i, f in enumerate(filepaths):
     )
     data = data[0]
     data = data.T.reshape((-1, data.shape[-1]))
-    print(data.shape)
-    break
 
-    # if i == 0:
-    #     dataset = 
+    if i == 0:
+        dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
+    dataset[i] = data
+
+np.save('/local/scratch-2/asv34/graph_weather/dataset/one_day.npy', dataset)
 
 
 

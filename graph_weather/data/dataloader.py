@@ -11,28 +11,31 @@ The dataloader has to do a few things for the model to work correctly
 
 """
 
-from . import const
 import numpy as np
-import pandas as pd
-import xarray as xr
-from pysolar.util import extraterrestrial_irrad
 from torch.utils.data import Dataset
+import torch
 
 
 class AnalysisDataset(Dataset):
-    def __init__(self, filepaths, invariant_path, mean, std, coarsen: int = 8):
+    def __init__(self, np_file):  # filepaths, invariant_path, mean, std, coarsen: int = 8
         super().__init__()
-        self.filepaths = sorted(filepaths)
-        self.invariant_path = invariant_path
-        self.coarsen = coarsen
-        self.mean = mean
-        self.std = std
+        # self.filepaths = sorted(filepaths)
+        # self.invariant_path = invariant_path
+        # self.coarsen = coarsen
+        # self.mean = mean
+        # self.std = std
+        self.dataset = torch.from_numpy(np.load(np_file))
 
     def __len__(self):
-        return len(self.filepaths) - 1
+        return self.dataset.shape[0] - 1
 
     def __getitem__(self, item):
-        
+        return self.dataset[item], self.dataset[item + 1]
+
+
+
+
+
 
 
 # obs_data = xr.open_zarr(
