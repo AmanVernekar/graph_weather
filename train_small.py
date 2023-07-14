@@ -48,7 +48,7 @@ for epoch in range(10):  # loop over the dataset multiple times
     print(f"Start Epoch: {epoch}")
     for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
-        inputs, labels = data[0].to(device), data[1].to(device)
+        inputs, labels = data[0].float().to(device), data[1].float().to(device)
         print("loaded data")
         # zero the parameter gradients
         optimizer.zero_grad()
