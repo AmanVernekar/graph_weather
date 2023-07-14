@@ -9,9 +9,7 @@ import numpy as np
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
 filepaths = sorted(filepaths, key=lambda f : int(f[-11:-9]))
 
-coarsen = 1
-
-np.ndarray(shape=(2,2), dtype=float)
+coarsen = 8 # change this in train_small too if changed here
 
 for i, f in enumerate(filepaths):
     if coarsen <= 1:  # Don't coarsen, so don't even call it

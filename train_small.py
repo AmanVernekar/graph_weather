@@ -8,10 +8,10 @@ from torch.utils.data import DataLoader, Dataset
 from graph_weather.models.losses import NormalizedMSELoss
 import torch.optim as optim
 
+ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/one_day.npy')
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
-
-coarsen = 32
-ds = AnalysisDataset(filepaths, '/local/scratch-2/asv34/graph_weather/ls_mask.zarr', 0, 0, coarsen)
+dataset = DataLoader(ds, batch_size=1, num_workers=32)
+coarsen = 8 # change this in preprocessor too if changed here
 
 data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
@@ -20,7 +20,7 @@ print(device)
 
 criterion = NormalizedMSELoss(lat_lons=lat_lons, feature_variance=[1,1], device=device).to(device)
 means = []
-dataset = DataLoader(ds, batch_size=1, num_workers=32)
+
 
 # train_dataset = dataset[:20]
 # test_dataset = dataset[20:]
@@ -57,7 +57,7 @@ for epoch in range(10):  # loop over the dataset multiple times
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         
-        if i < 20: # use first 20 for training and the rest for testing
+        if i < 19: # use first 19 for training and the remaining 4 for testing
             loss.backward()
             optimizer.step()
 
