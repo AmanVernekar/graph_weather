@@ -29,7 +29,6 @@ for i, f in enumerate(filepaths):
         ],
         axis=-1,
     )
-    data = data[0]
     data = data.T.reshape((-1, data.shape[-1]))
 
     if i == 0:
