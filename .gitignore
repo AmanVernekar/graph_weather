@@ -7,3 +7,4 @@ pat.txt
 *.zip
 dataset/
 output.txt
+*.code-workspace
