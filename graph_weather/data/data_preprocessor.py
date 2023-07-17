@@ -25,7 +25,7 @@ for i, f in enumerate(filepaths):
     data = np.stack(
         [
             zarr[f"{var}"].values
-            for var in ['t', 'z', 'q', 'u', 'v', 'w']
+            for var in zarr.data_vars
         ],
         axis=-1,
     )

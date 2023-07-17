@@ -182,6 +182,8 @@ class NodeProcessor(nn.Module):
         """
         row, col = edge_index
         out = scatter_sum(edge_attr, col, dim=0)  # aggregate edge message by target
+        print(x.shape)
+        print(out.shape)
         out = cat([x, out], dim=-1)
         out = self.node_mlp(out)
         out += x  # residual connection
