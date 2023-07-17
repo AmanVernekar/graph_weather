@@ -6,8 +6,8 @@ import numpy as np
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
-filepaths = sorted(filepaths, key=lambda f : int(f[-11:-9]))
+filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
+filepaths = sorted(filepaths)
 
 coarsen = 8 # change this in train_small too if changed here
 
@@ -36,7 +36,7 @@ for i, f in enumerate(filepaths):
         dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
     dataset[i] = data
 
-np.save('/local/scratch-2/asv34/graph_weather/dataset/one_day.npy', dataset)
+np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022.npy', dataset)
 
 
 
