@@ -27,7 +27,7 @@ means = []
 train_count = 90
 test_count = len(ds) - train_count
 
-model = GraphWeatherForecaster(lat_lons, num_blocks=3).to(device)
+model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=3).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
 param_size = 0

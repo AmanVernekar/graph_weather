@@ -22,14 +22,19 @@ for i, f in enumerate(filepaths):
             .coarsen(longitude=coarsen)
             .mean()
         )
-    data = np.stack(
-        [
-            zarr[f"{var}"].values
-            for var in zarr.data_vars
-        ],
-        axis=-1,
-    )
-    data = data.T.reshape((-1, data.shape[-1]))
+    # data = np.stack(
+    #     [
+    #         zarr[f"{var}"].values
+    #         for var in zarr.data_vars
+    #     ],
+    #     axis=-1,
+    # )
+    # data = data.T.reshape((-1, data.shape[-1]))
+
+    data = np.concatenate(
+        [zarr[var].values[0] for var in zarr.data_vars]
+    ).T
+    data = np.reshape(data, (-1, data.shape[-1]))
 
     if i == 0:
         dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
