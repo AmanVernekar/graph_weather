@@ -27,7 +27,7 @@ means = []
 train_count = 90
 test_count = len(ds) - train_count
 
-model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=3).to(device)
+model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
 
 param_size = 0
@@ -47,7 +47,7 @@ for epoch in range(100):  # loop over the dataset multiple times
     running_loss = 0.0
     test_loss = 0.0
     start = time.time()
-    print(f"Start Epoch: {epoch+1}")
+    # print(f"Start Epoch: {epoch+1}")
     for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
@@ -65,12 +65,12 @@ for epoch in range(100):  # loop over the dataset multiple times
             # print statistics
             running_loss += loss.item()
             end = time.time()
-            print(
-                f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / (i + 1):.3f} Time: {end - start} sec"
-            )
+            # print(
+            #     f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / (i + 1):.3f} Time: {end - start} sec"
+            # )
         else:
             test_loss += loss.item()
     print(f"test loss after epoch {epoch+1} is {test_loss/test_count}.")
 
 print("Finished Training")
-torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_100epochs.pt')
+torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_big_model_100epochs.pt')
