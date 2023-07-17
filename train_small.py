@@ -8,8 +8,8 @@ from torch.utils.data import DataLoader, Dataset
 from graph_weather.models.losses import NormalizedMSELoss
 import torch.optim as optim
 
-ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/one_day.npy')
-filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/one_day/*")
+ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/jan_2022.npy')
+filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
 coarsen = 8 # change this in preprocessor too if changed here
 
@@ -24,6 +24,8 @@ means = []
 
 # train_dataset = dataset[:20]
 # test_dataset = dataset[20:]
+train_count = 90
+test_count = len(ds) - train_count
 
 model = GraphWeatherForecaster(lat_lons, num_blocks=3).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=0.001)
@@ -41,7 +43,7 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 import time
 
-for epoch in range(1000):  # loop over the dataset multiple times
+for epoch in range(100):  # loop over the dataset multiple times
     running_loss = 0.0
     test_loss = 0.0
     start = time.time()
@@ -56,7 +58,7 @@ for epoch in range(1000):  # loop over the dataset multiple times
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         
-        if i < 19: # use first 19 for training and the remaining 4 for testing
+        if i < train_count: # use first 90 for training and the remaining 33 for testing
             loss.backward()
             optimizer.step()
 
@@ -68,6 +70,6 @@ for epoch in range(1000):  # loop over the dataset multiple times
             )
         else:
             test_loss += loss.item()
-    print(f"test loss after epoch {epoch+1} is {test_loss/4}.")
+    print(f"test loss after epoch {epoch+1} is {test_loss/test_count}.")
 
 print("Finished Training")
