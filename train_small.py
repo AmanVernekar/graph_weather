@@ -24,7 +24,7 @@ means = []
 
 # train_dataset = dataset[:20]
 # test_dataset = dataset[20:]
-train_count = 90
+train_count = 100
 test_count = len(ds) - train_count
 
 model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
@@ -41,37 +41,40 @@ size_all_mb = (param_size + buffer_size) / 1024**2
 print('model size: {:.3f}MB'.format(size_all_mb))
 
 print("Done Setup")
-import time
+# import time
 
 for epoch in range(100):  # loop over the dataset multiple times
     running_loss = 0.0
     test_loss = 0.0
-    start = time.time()
+    # start = time.time()
     # print(f"Start Epoch: {epoch+1}")
     for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
-        # zero the parameter gradients
-        optimizer.zero_grad()
-
-        # forward + backward + optimize
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        
-        if i < train_count: # use first 90 for training and the remaining 33 for testing
+        if i < train_count: # use first 100 for training and the remaining 23 for testing
+            model.train()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            
             loss.backward()
             optimizer.step()
+            optimizer.zero_grad()
 
-            # print statistics
             running_loss += loss.item()
-            end = time.time()
+            # end = time.time()
+
             # print(
             #     f"[{epoch + 1}, {i + 1:5d}] loss: {running_loss / (i + 1):.3f} Time: {end - start} sec"
             # )
         else:
-            test_loss += loss.item()
+            model.eval()
+            with torch.no_grad():
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                test_loss += loss.item()
+    
     print(f"train loss after epoch {epoch+1} is {running_loss/train_count}.")
     print(f"test loss after epoch {epoch+1} is {test_loss/test_count}.")
 
 print("Finished Training")
-torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_big_model_100epochs.pt')
+torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_big_model_100epochs1.pt')
