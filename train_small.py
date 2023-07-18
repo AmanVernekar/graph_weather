@@ -28,7 +28,7 @@ train_count = 90
 test_count = len(ds) - train_count
 
 model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=0.001)
+optimizer = optim.AdamW(model.parameters(), lr=0.01)
 
 param_size = 0
 for param in model.parameters():
@@ -70,6 +70,7 @@ for epoch in range(100):  # loop over the dataset multiple times
             # )
         else:
             test_loss += loss.item()
+    print(f"train loss after epoch {epoch+1} is {running_loss/train_count}.")
     print(f"test loss after epoch {epoch+1} is {test_loss/test_count}.")
 
 print("Finished Training")
