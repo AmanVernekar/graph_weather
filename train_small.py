@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader, Dataset
 from graph_weather.models.losses import NormalizedMSELoss
 import torch.optim as optim
 
-ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/jan_2022.npy')
+ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_rescaled.npy')
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
 coarsen = 8 # change this in preprocessor too if changed here

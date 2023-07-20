@@ -40,7 +40,10 @@ for i, f in enumerate(filepaths):
         dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
     dataset[i] = data
 
-np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022.npy', dataset)
+means = np.mean(dataset, axis=0)
+means = np.mean(means, axis=0)
+dataset = dataset/means
+np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_rescaled.npy', dataset)
 
 
 
