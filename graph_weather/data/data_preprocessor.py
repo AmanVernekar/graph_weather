@@ -42,8 +42,14 @@ for i, f in enumerate(filepaths):
 
 means = np.mean(dataset, axis=0)
 means = np.mean(means, axis=0)
-dataset = dataset/means
-np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_rescaled.npy', dataset)
+
+variances = (dataset - means)**2
+variances = np.mean(variances, axis=0)
+variances = np.mean(variances, axis=0)
+stdev = np.sqrt(variances)
+new = (dataset - means)/stdev
+
+np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_normed.npy', dataset)
 
 
 
