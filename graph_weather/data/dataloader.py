@@ -34,6 +34,20 @@ class AnalysisDataset(Dataset):
 
 
 
+class ParallelDataset(Dataset):
+    def __init__(self, np_file, num_steps):  # filepaths, invariant_path, mean, std, coarsen: int = 8
+        super().__init__()
+        self.dataset = torch.from_numpy(np.load(np_file))
+        self.num_steps = num_steps
+
+    def __len__(self):
+        return self.dataset.shape[0] - self.num_steps
+
+    def __getitem__(self, item):
+        features = []
+        for i in range(item, item + self.num_steps):
+            features.append(self.dataset[i])
+        return features, self.dataset[item + self.num_steps]
 
 
 
