@@ -28,7 +28,7 @@ train_count = 100
 test_count = len(ds) - train_count
 
 model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-optimizer = optim.AdamW(model.parameters(), lr=0.01)
+optimizer = optim.AdamW(model.parameters(), lr=1e-5)
 
 param_size = 0
 for param in model.parameters():
@@ -77,4 +77,4 @@ for epoch in range(100):  # loop over the dataset multiple times
     print(f"test loss after epoch {epoch+1} is {test_loss/test_count}.")
 
 print("Finished Training")
-torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_big_model_100epochs1.pt')
+torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/jan2022_rescaled_100epochs.pt')
