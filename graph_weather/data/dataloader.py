@@ -47,7 +47,7 @@ class ParallelDataset(Dataset):
         features = []
         for i in range(item, item + self.num_steps):
             features.append(self.dataset[i])
-        return features, self.dataset[item + self.num_steps]
+        return torch.stack(features), self.dataset[item + self.num_steps]
 
 
 
