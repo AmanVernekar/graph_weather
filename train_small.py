@@ -8,7 +8,10 @@ from torch.utils.data import DataLoader, Dataset
 from graph_weather.models.losses import NormalizedMSELoss
 import torch.optim as optim
 
-ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_normed.npy')
+num_steps = 3
+
+# ds = AnalysisDataset('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_normed.npy')
+ds = ParallelDataset('', num_steps=num_steps)
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
 dataset = DataLoader(ds, batch_size=1, num_workers=32)
 coarsen = 8 # change this in preprocessor too if changed here
@@ -28,7 +31,7 @@ train_count = 100
 test_count = len(ds) - train_count
 
 # model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-model = ParallelForecaster(lat_lons=lat_lons, num_steps=3, feature_dim=42)
+model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42)
 optimizer = optim.AdamW(model.parameters(), lr=1e-5)
 
 param_size = 0

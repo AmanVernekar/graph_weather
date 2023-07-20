@@ -1,4 +1,4 @@
-from forecast import GraphWeatherForecaster
+from .forecast import GraphWeatherForecaster
 import torch
 from typing import Optional
 from torch import nn
