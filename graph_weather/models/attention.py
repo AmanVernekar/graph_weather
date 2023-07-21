@@ -52,7 +52,7 @@ class ParallelForecaster(torch.nn.Module):
                     hidden_layers_decoder=hidden_layers_decoder,
                     norm_type=norm_type,
                     use_checkpointing=use_checkpointing
-                )
+                ).to(torch.device('cuda'))
             )
         self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
     
