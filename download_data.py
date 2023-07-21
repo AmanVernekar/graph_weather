@@ -6,7 +6,7 @@ import numcodecs
 c = cdsapi.Client()
 
 for year in [2022]:
-    for month in [1]:
+    for month in [4, 7, 10]:
         for day in range(1,31):
             for time in ['00:00', '06:00', '12:00', '18:00']:
                 try:
