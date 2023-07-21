@@ -110,7 +110,7 @@ class Encoder(torch.nn.Module):
 
         # Extra starting ones for appending to inputs, could 'learn' good starting points
         self.h3_nodes = torch.nn.Parameter(
-            torch.zeros((h3.num_hexagons(resolution), input_dim), dtype=torch.float)
+            torch.zeros((h3.num_hexagons(resolution), input_dim), dtype=torch.float, device="cuda")
         )
         # Output graph
 
@@ -160,7 +160,7 @@ class Encoder(torch.nn.Module):
             Torch tensors of node features, latent graph edge index, and latent edge attributes
         """
         batch_size = features.shape[0]
-        self.h3_nodes = self.h3_nodes.to(features.device)
+        # self.h3_nodes = self.h3_nodes.to(features.device)
         self.graph = self.graph.to(features.device)
         self.latent_graph = self.latent_graph.to(features.device)
         features = torch.cat(
