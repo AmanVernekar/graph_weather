@@ -110,7 +110,7 @@ class Encoder(torch.nn.Module):
 
         # Extra starting ones for appending to inputs, could 'learn' good starting points
         self.h3_nodes = torch.nn.Parameter(
-            torch.zeros((h3.num_hexagons(resolution), input_dim), dtype=torch.float) # , device='cuda'
+            torch.zeros((h3.num_hexagons(resolution), input_dim), dtype=torch.float, device='cuda')
         )
         # self.h3_nodes = self.h3_nodes.to(torch.device('cuda'))
         # Output graph
