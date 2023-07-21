@@ -32,7 +32,7 @@ train_count = 100
 test_count = len(ds) - train_count
 
 # model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42)
+model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=1e-5)
 
 param_size = 0
