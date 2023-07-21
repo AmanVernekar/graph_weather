@@ -135,6 +135,8 @@ class ParallelForecaster(torch.nn.Module):
         # return out
 
         out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1])
+        print(out.shape)
+        print(self.model1(torch.stack([features[0][0]]).to(features.device))).shape
         out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))
         out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))
         out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))
