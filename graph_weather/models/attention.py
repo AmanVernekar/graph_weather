@@ -56,7 +56,68 @@ class ParallelForecaster(torch.nn.Module):
         #             use_checkpointing=use_checkpointing
         #         ).to(torch.device('cuda'))
         #     )
-        self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
+        
+        self.model1 = GraphWeatherForecaster(
+                    lat_lons=lat_lons,
+                    resolution=resolution,
+                    feature_dim=feature_dim,
+                    aux_dim=aux_dim,
+                    output_dim=output_dim,
+                    node_dim=node_dim,
+                    edge_dim=edge_dim,
+                    num_blocks=num_blocks,
+                    hidden_dim_processor_node=hidden_dim_processor_node,
+                    hidden_dim_processor_edge=hidden_dim_processor_edge,
+                    hidden_layers_processor_node=hidden_layers_processor_node,
+                    hidden_layers_processor_edge=hidden_layers_processor_edge,
+                    hidden_dim_decoder=hidden_dim_decoder,
+                    hidden_layers_decoder=hidden_layers_decoder,
+                    norm_type=norm_type,
+                    use_checkpointing=use_checkpointing
+                )
+        
+        self.model2 = GraphWeatherForecaster(
+                    lat_lons=lat_lons,
+                    resolution=resolution,
+                    feature_dim=feature_dim,
+                    aux_dim=aux_dim,
+                    output_dim=output_dim,
+                    node_dim=node_dim,
+                    edge_dim=edge_dim,
+                    num_blocks=num_blocks,
+                    hidden_dim_processor_node=hidden_dim_processor_node,
+                    hidden_dim_processor_edge=hidden_dim_processor_edge,
+                    hidden_layers_processor_node=hidden_layers_processor_node,
+                    hidden_layers_processor_edge=hidden_layers_processor_edge,
+                    hidden_dim_decoder=hidden_dim_decoder,
+                    hidden_layers_decoder=hidden_layers_decoder,
+                    norm_type=norm_type,
+                    use_checkpointing=use_checkpointing
+                )        
+        
+        self.model3 = GraphWeatherForecaster(
+                    lat_lons=lat_lons,
+                    resolution=resolution,
+                    feature_dim=feature_dim,
+                    aux_dim=aux_dim,
+                    output_dim=output_dim,
+                    node_dim=node_dim,
+                    edge_dim=edge_dim,
+                    num_blocks=num_blocks,
+                    hidden_dim_processor_node=hidden_dim_processor_node,
+                    hidden_dim_processor_edge=hidden_dim_processor_edge,
+                    hidden_layers_processor_node=hidden_layers_processor_node,
+                    hidden_layers_processor_edge=hidden_layers_processor_edge,
+                    hidden_dim_decoder=hidden_dim_decoder,
+                    hidden_layers_decoder=hidden_layers_decoder,
+                    norm_type=norm_type,
+                    use_checkpointing=use_checkpointing
+                )
+
+        # self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
+        self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+        self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+        self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
         # self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
     
 
@@ -67,8 +128,14 @@ class ParallelForecaster(torch.nn.Module):
         #     out.append(self.models[i](inp.to(features.device)))
         # return self.final_layer(torch.cat(out, dim=-1))
 
+        # out = torch.zeros([features[0][0]].shape[0], [features[0][0]].shape[1])
+        # for i in range(self.num_steps):
+        #     inp = torch.stack([features[0][i]])
+        #     out += self.params[i]*self.models[i](inp.to(features.device))
+        # return out
+
         out = torch.zeros([features[0][0]].shape[0], [features[0][0]].shape[1])
-        for i in range(self.num_steps):
-            inp = torch.stack([features[0][i]])
-            out += self.params[i]*self.models[i](inp.to(features.device))
+        out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))
+        out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))
+        out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))
         return out
