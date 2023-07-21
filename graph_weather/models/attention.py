@@ -7,6 +7,7 @@ class ParallelForecaster(torch.nn.Module):
     def __init__(
         self,
         lat_lons: list,
+        models: list,
         num_steps:int = 2,
         resolution: int = 2,
         feature_dim: int = 42, #TODO change back to 78
@@ -32,28 +33,29 @@ class ParallelForecaster(torch.nn.Module):
             output_dim = self.feature_dim
 
         self.num_steps = num_steps
-        self.models = []
-        for i in range(num_steps):
-            self.models.append(
-                GraphWeatherForecaster(
-                    lat_lons=lat_lons,
-                    resolution=resolution,
-                    feature_dim=feature_dim,
-                    aux_dim=aux_dim,
-                    output_dim=output_dim,
-                    node_dim=node_dim,
-                    edge_dim=edge_dim,
-                    num_blocks=num_blocks,
-                    hidden_dim_processor_node=hidden_dim_processor_node,
-                    hidden_dim_processor_edge=hidden_dim_processor_edge,
-                    hidden_layers_processor_node=hidden_layers_processor_node,
-                    hidden_layers_processor_edge=hidden_layers_processor_edge,
-                    hidden_dim_decoder=hidden_dim_decoder,
-                    hidden_layers_decoder=hidden_layers_decoder,
-                    norm_type=norm_type,
-                    use_checkpointing=use_checkpointing
-                ).to(torch.device('cuda'))
-            )
+        self.models = models
+        # self.models = []
+        # for i in range(num_steps):
+        #     self.models.append(
+        #         GraphWeatherForecaster(
+        #             lat_lons=lat_lons,
+        #             resolution=resolution,
+        #             feature_dim=feature_dim,
+        #             aux_dim=aux_dim,
+        #             output_dim=output_dim,
+        #             node_dim=node_dim,
+        #             edge_dim=edge_dim,
+        #             num_blocks=num_blocks,
+        #             hidden_dim_processor_node=hidden_dim_processor_node,
+        #             hidden_dim_processor_edge=hidden_dim_processor_edge,
+        #             hidden_layers_processor_node=hidden_layers_processor_node,
+        #             hidden_layers_processor_edge=hidden_layers_processor_edge,
+        #             hidden_dim_decoder=hidden_dim_decoder,
+        #             hidden_layers_decoder=hidden_layers_decoder,
+        #             norm_type=norm_type,
+        #             use_checkpointing=use_checkpointing
+        #         ).to(torch.device('cuda'))
+        #     )
         self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
         # self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
     
