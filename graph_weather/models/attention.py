@@ -54,7 +54,7 @@ class ParallelForecaster(torch.nn.Module):
                     use_checkpointing=use_checkpointing
                 ).to(torch.device('cuda'))
             )
-        self.params = [nn.Parameter() for i in range(self.num_steps)]
+        self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
         # self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
     
 
