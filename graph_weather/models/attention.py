@@ -115,10 +115,10 @@ class ParallelForecaster(torch.nn.Module):
                 )
 
         # self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
-        self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        # self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
+        # self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+        # self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+        # self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+        self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
     
 
     def forward(self, features):
@@ -134,8 +134,15 @@ class ParallelForecaster(torch.nn.Module):
         #     out += self.params[i]*self.models[i](inp.to(features.device))
         # return out
 
-        out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device)
-        out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))[0]
-        out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))[0]
-        out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))[0]
-        return torch.stack([out])
+        # out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device)
+        # out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))[0]
+        # out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))[0]
+        # out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))[0]
+        # return torch.stack([out])
+
+        out = []
+        out.append(self.model1(torch.stack([features[0][0]]).to(features.device)))
+        out.append(self.model2(torch.stack([features[0][1]]).to(features.device)))
+        out.append(self.model3(torch.stack([features[0][2]]).to(features.device)))
+        return self.final_layer(torch.cat(out, dim=-1))
+    
