@@ -60,5 +60,5 @@ class ParallelForecaster(torch.nn.Module):
     def forward(self, features):
         out = []
         for i in range(self.num_steps):
-            out.append(self.models[i](features[i].to(features.device)))
+            out.append(self.models[i](features[0][i].to(features.device)))
         return self.final_layer(torch.cat(out, dim=1))
