@@ -12,7 +12,8 @@ num_steps = 3
 
 # ds = AnalysisDataset(file_name)
 # ds = ParallelDataset(np_file=file_name, num_steps=num_steps)
-ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in [1,4,7,10]]
+# ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in [1,4,7,10]]
+ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in [1,4,7,10]]
 datasets = [DataLoader(ds, batch_size=1, num_workers=32) for ds in ds_list]
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
@@ -31,8 +32,9 @@ means = []
 # val_dataset = dataset[20:]
 train_count = 95
 
-models = [GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device) for i in range(num_steps)]
-model = ParallelForecaster(lat_lons=lat_lons, models=models, num_steps=num_steps, feature_dim=42).to(device)
+# models = [GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device) for i in range(num_steps)]
+# model = ParallelForecaster(lat_lons=lat_lons, models=models, num_steps=num_steps, feature_dim=42).to(device)
+model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
 optimizer = optim.AdamW(model.parameters(), lr=1e-5)
 
 param_size = 0
@@ -89,4 +91,4 @@ for epoch in range(100):  # loop over the dataset multiple times
     print(f"val loss after epoch {epoch+1} is {val_loss/total_val_count}.")
 
 print("Finished Training")
-torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_parallel3_wparams_100epochs.pt')
+torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_singlemodel_100epochs.pt')
