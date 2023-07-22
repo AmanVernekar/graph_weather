@@ -6,7 +6,7 @@ import numpy as np
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
+filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/2022_04*")
 filepaths = sorted(filepaths)
 
 coarsen = 8 # change this in train_small too if changed here
@@ -49,7 +49,7 @@ variances = np.mean(variances, axis=0)
 stdev = np.sqrt(variances)
 new = (dataset - means)/stdev
 
-np.save('/local/scratch-2/asv34/graph_weather/dataset/jan_2022_normed.npy', dataset)
+np.save('/local/scratch-2/asv34/graph_weather/dataset/apr_2022_normed.npy', dataset)
 
 
 
