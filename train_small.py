@@ -89,4 +89,4 @@ for epoch in range(100):  # loop over the dataset multiple times
     print(f"val loss after epoch {epoch+1} is {val_loss/total_val_count}.")
 
 print("Finished Training")
-torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_parallel3_linlayer_100epochs.pt')
+torch.save(model.state_dict(), '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_parallel3_wparams_100epochs.pt')
