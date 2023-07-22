@@ -6,50 +6,58 @@ import numpy as np
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/2022_04*")
-filepaths = sorted(filepaths)
-
 coarsen = 8 # change this in train_small too if changed here
 
-for i, f in enumerate(filepaths):
-    if coarsen <= 1:  # Don't coarsen, so don't even call it
-        zarr = xr.open_zarr(f, consolidated=True)
-    else:
-        zarr = (
-            xr.open_zarr(f, consolidated=True)
-            .coarsen(latitude=coarsen, boundary="pad")
-            .mean()
-            .coarsen(longitude=coarsen)
-            .mean()
-        )
-    # data = np.stack(
-    #     [
-    #         zarr[f"{var}"].values
-    #         for var in zarr.data_vars
-    #     ],
-    #     axis=-1,
-    # )
-    # data = data.T.reshape((-1, data.shape[-1]))
+datasets = [np.load('/local/scratch-2/asv34/graph_weather/dataset/jan_2022.npy')]
 
-    data = np.concatenate(
-        [zarr[var].values[0] for var in zarr.data_vars]
-    ).T
-    data = np.reshape(data, (-1, data.shape[-1]))
+for month in ['04', '07', '10']:
+    filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/2022/2022_{month}*")
+    filepaths = sorted(filepaths)
 
-    if i == 0:
-        dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
-    dataset[i] = data
+    for i, f in enumerate(filepaths):
+        if coarsen <= 1:  # Don't coarsen, so don't even call it
+            zarr = xr.open_zarr(f, consolidated=True)
+        else:
+            zarr = (
+                xr.open_zarr(f, consolidated=True)
+                .coarsen(latitude=coarsen, boundary="pad")
+                .mean()
+                .coarsen(longitude=coarsen)
+                .mean()
+            )
+        # data = np.stack(
+        #     [
+        #         zarr[f"{var}"].values
+        #         for var in zarr.data_vars
+        #     ],
+        #     axis=-1,
+        # )
+        # data = data.T.reshape((-1, data.shape[-1]))
 
-means = np.mean(dataset, axis=0)
+        data = np.concatenate(
+            [zarr[var].values[0] for var in zarr.data_vars]
+        ).T
+        data = np.reshape(data, (-1, data.shape[-1]))
+
+        if i == 0:
+            dataset = np.ndarray(shape=[len(filepaths)] + list(data.shape), dtype=float)
+        dataset[i] = data
+    datasets.append(dataset)
+
+datasets_np = np.concatenate(datasets, axis=0)
+
+means = np.mean(datasets_np, axis=0)
 means = np.mean(means, axis=0)
 
-variances = (dataset - means)**2
+variances = (datasets_np - means)**2
 variances = np.mean(variances, axis=0)
 variances = np.mean(variances, axis=0)
 stdev = np.sqrt(variances)
-new = (dataset - means)/stdev
 
-np.save('/local/scratch-2/asv34/graph_weather/dataset/apr_2022_normed.npy', dataset)
+for i, dataset in enumerate(datasets):
+    new = (dataset - means)/stdev
+    month = (i)*3 + 1
+    np.save(f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', new) # change dataset back to new
 
 
 
