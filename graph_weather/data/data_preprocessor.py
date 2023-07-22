@@ -54,6 +54,10 @@ variances = np.mean(variances, axis=0)
 variances = np.mean(variances, axis=0)
 stdev = np.sqrt(variances)
 
+print(f'means are {means}\n\n')
+print(f'variances are {variances}\n\n')
+print(f'stdevs are {stdev}\n\n')
+
 for i, dataset in enumerate(datasets):
     new = (dataset - means)/stdev
     month = (i)*3 + 1
