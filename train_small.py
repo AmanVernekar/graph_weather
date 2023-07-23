@@ -11,8 +11,11 @@ import sys
 import matplotlib.pyplot as plt
 
 num_steps = 3
-model_type = sys.argv[0]
-cuda_num = sys.argv[1]
+print(sys.argv[1])
+print(sys.argv[3])
+exit()
+model_type = sys.argv[1]
+cuda_num = sys.argv[3]
 train_count = 95
 num_epochs = 100
 
