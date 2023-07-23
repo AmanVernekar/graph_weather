@@ -7,7 +7,7 @@ class ParallelForecaster(torch.nn.Module):
     def __init__(
         self,
         lat_lons: list,
-        models: list,
+        model_type: str,
         num_steps:int = 2,
         resolution: int = 2,
         feature_dim: int = 42, #TODO change back to 78
@@ -33,7 +33,6 @@ class ParallelForecaster(torch.nn.Module):
             output_dim = self.feature_dim
 
         self.num_steps = num_steps
-        self.models = models
         # self.models = []
         # for i in range(num_steps):
         #     self.models.append(
@@ -114,11 +113,15 @@ class ParallelForecaster(torch.nn.Module):
                     use_checkpointing=use_checkpointing
                 )
 
-        # self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
-        self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-        # self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
+        self.model_type = model_type
+
+        if model_type == 'linear':
+            self.final_layer = nn.Linear(num_steps*output_dim, output_dim)
+        elif model_type == 'params':
+            # self.params = [nn.Parameter(data=torch.tensor([1/self.num_steps])) for i in range(self.num_steps)]
+            self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+            self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
+            self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
     
 
     def forward(self, features):
@@ -134,15 +137,17 @@ class ParallelForecaster(torch.nn.Module):
         #     out += self.params[i]*self.models[i](inp.to(features.device))
         # return out
 
-        out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device)
-        out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))[0]
-        out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))[0]
-        out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))[0]
-        return torch.stack([out])
+        if self.model_type == 'linear':
+            out = []
+            out.append(self.model1(torch.stack([features[0][0]]).to(features.device)))
+            out.append(self.model2(torch.stack([features[0][1]]).to(features.device)))
+            out.append(self.model3(torch.stack([features[0][2]]).to(features.device)))
+            return self.final_layer(torch.cat(out, dim=-1))
 
-        # out = []
-        # out.append(self.model1(torch.stack([features[0][0]]).to(features.device)))
-        # out.append(self.model2(torch.stack([features[0][1]]).to(features.device)))
-        # out.append(self.model3(torch.stack([features[0][2]]).to(features.device)))
-        # return self.final_layer(torch.cat(out, dim=-1))
+        elif self.model_type == 'params':
+            out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device)
+            out += self.param1*self.model1(torch.stack([features[0][0]]).to(features.device))[0]
+            out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))[0]
+            out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))[0]
+            return torch.stack([out])
     

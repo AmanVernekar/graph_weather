@@ -6,5 +6,5 @@ pat.txt
 *.zarr
 *.zip
 dataset/
-output*.txt
+# output*.txt
 *.code-workspace
