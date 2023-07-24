@@ -164,7 +164,10 @@ class ParallelForecaster(torch.nn.Module):
 
             out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device) 
             for i, coeffs in enumerate(alphas):
+                print(coeffs.shape)
                 for j in range(self.num_steps):
+                    print(coeffs[j])
+                    print(embedding[j][i])
                     out[i] = out[i] + coeffs[j]*embedding[j][i]
             
             return torch.stack([out])
