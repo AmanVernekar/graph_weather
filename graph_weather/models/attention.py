@@ -168,7 +168,7 @@ class ParallelForecaster(torch.nn.Module):
                 print(coeffs.shape)
                 for j in range(self.num_steps):
                     print(coeffs[j])
-                    print(embedding[j][i])
+                    print(embedding[j][i].shape)
                     out[i] = out[i] + coeffs[j]*embedding[j][i]
             
             print('all good')
