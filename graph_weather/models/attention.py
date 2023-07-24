@@ -160,7 +160,7 @@ class ParallelForecaster(torch.nn.Module):
             embedding.append(self.model2(torch.stack([features[0][1]]).to(features.device))[0])
             embedding.append(self.model3(torch.stack([features[0][2]]).to(features.device))[0])
             
-            alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))[0]
+            alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))
             print(alphas.shape)
 
             out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device) 
