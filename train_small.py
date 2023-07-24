@@ -21,7 +21,7 @@ num_epochs = 100
 # start = 1e-6
 # ratio = 100**0.25
 # learning_rates = [start * ratio**i for i in range(n)]
-learning_rates = [1e-4]
+lr = 1e-5
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
@@ -37,7 +37,7 @@ print(device)
 if model_type == 'single':
     ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in [1,4,7,10]]
     # model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-elif model_type == 'linear' or model_type == 'params':
+else:
     ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in [1,4,7,10]]
     # model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
 
@@ -72,53 +72,53 @@ def plot_graph(num_epochs, train_losses, val_losses, model_type, lr, k):
     fig.savefig(f'/local/scratch-2/asv34/graph_weather/plots/plot_2022_4months_normed_{model_type}_lr{k}_{num_epochs}epochs.png')
 
 
-for k, lr in enumerate(learning_rates):
-    if model_type == 'single':
-        model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-    elif model_type == 'linear' or model_type == 'params':
-        model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
+# for k, lr in enumerate(learning_rates):
+if model_type == 'single':
+    model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
+else:
+    model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
 
-    optimizer = optim.AdamW(model.parameters(), lr=1e-5)
-    train_losses = []
-    val_losses = []
-    for epoch in range(num_epochs):  # loop over the dataset multiple times
-        running_loss = 0.0
-        val_loss = 0.0
-        total_val_count = 0
-        total_train_count = 0
-        
-        for j, dataset in enumerate(datasets):
-            val_count = len(ds_list[j]) - train_count
-            total_train_count += train_count
-            total_val_count += val_count
-            for i, data in enumerate(dataset):
-                # get the inputs; data is a list of [inputs, labels]
-                inputs, labels = data[0].float().to(device), data[1].float().to(device)
-                if i < train_count: # use first 95 for training and the remaining for validation
-                    model.train()
+optimizer = optim.AdamW(model.parameters(), lr=1e-5)
+train_losses = []
+val_losses = []
+for epoch in range(num_epochs):  # loop over the dataset multiple times
+    running_loss = 0.0
+    val_loss = 0.0
+    total_val_count = 0
+    total_train_count = 0
+    
+    for j, dataset in enumerate(datasets):
+        val_count = len(ds_list[j]) - train_count
+        total_train_count += train_count
+        total_val_count += val_count
+        for i, data in enumerate(dataset):
+            # get the inputs; data is a list of [inputs, labels]
+            inputs, labels = data[0].float().to(device), data[1].float().to(device)
+            if i < train_count: # use first 95 for training and the remaining for validation
+                model.train()
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                
+                loss.backward()
+                optimizer.step()
+                optimizer.zero_grad()
+
+                running_loss += loss.item()
+            else:
+                model.eval()
+                with torch.no_grad():
                     outputs = model(inputs)
                     loss = criterion(outputs, labels)
-                    
-                    loss.backward()
-                    optimizer.step()
-                    optimizer.zero_grad()
+                    val_loss += loss.item()
+    
+    train_losses.append(running_loss/total_train_count)
+    val_losses.append(val_loss/total_val_count)
+    print(f"train loss after epoch {epoch+1} is {running_loss/total_train_count}.")
+    print(f"val loss after epoch {epoch+1} is {val_loss/total_val_count}.")
 
-                    running_loss += loss.item()
-                else:
-                    model.eval()
-                    with torch.no_grad():
-                        outputs = model(inputs)
-                        loss = criterion(outputs, labels)
-                        val_loss += loss.item()
-        
-        train_losses.append(running_loss/total_train_count)
-        val_losses.append(val_loss/total_val_count)
-        print(f"train loss after epoch {epoch+1} is {running_loss/total_train_count}.")
-        print(f"val loss after epoch {epoch+1} is {val_loss/total_val_count}.")
-
-    print(f"Finished Training at {lr=}")
-    print(f'train_losses:\n{train_losses}\n')
-    print(f'val_losses:\n{val_losses}\n\n')
-    plot_graph(num_epochs=num_epochs, train_losses=train_losses, val_losses=val_losses, model_type=model_type, lr=lr, k=k)
-    # torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{k}_{num_epochs}epochs.pt')
-    torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr4_{num_epochs}epochs.pt')
+print(f"Finished Training at {lr=}")
+print(f'train_losses:\n{train_losses}\n')
+print(f'val_losses:\n{val_losses}\n\n')
+plot_graph(num_epochs=num_epochs, train_losses=train_losses, val_losses=val_losses, model_type=model_type, lr=lr, k=lr)
+# torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{k}_{num_epochs}epochs.pt')
+torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{lr}_{num_epochs}epochs.pt')

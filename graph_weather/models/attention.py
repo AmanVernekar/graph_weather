@@ -122,7 +122,10 @@ class ParallelForecaster(torch.nn.Module):
             self.param1 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
             self.param2 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
             self.param3 = nn.Parameter(data=torch.tensor([1/self.num_steps]))
-    
+        elif model_type == 'simple_attention':
+            self.attention_layer = nn.Linear(num_steps*output_dim, num_steps, bias=False)
+            self.leaky = nn.LeakyReLU(0.2) 
+            self.soft = nn.Softmax(dim=1)   
 
     def forward(self, features):
         # out = []
@@ -150,4 +153,18 @@ class ParallelForecaster(torch.nn.Module):
             out += self.param2*self.model2(torch.stack([features[0][1]]).to(features.device))[0]
             out += self.param3*self.model3(torch.stack([features[0][2]]).to(features.device))[0]
             return torch.stack([out])
-    
+        
+        elif self.model_type == 'simple_attention':
+            embedding = []
+            embedding.append(self.model1(torch.stack([features[0][0]]).to(features.device)))
+            embedding.append(self.model2(torch.stack([features[0][1]]).to(features.device)))
+            embedding.append(self.model3(torch.stack([features[0][2]]).to(features.device)))
+            
+            alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))
+
+            out = torch.zeros(features[0][0].shape[0], features[0][0].shape[1]).to(features.device) 
+            for i, coeffs in enumerate(alphas):
+                for j in range(self.num_steps):
+                    out[i] = out[i] + coeffs[j]*embedding[j][i]
+            
+            return torch.stack([out])
