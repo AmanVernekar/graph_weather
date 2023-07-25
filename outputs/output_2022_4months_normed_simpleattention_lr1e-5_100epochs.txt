@@ -1,0 +1,21 @@
+cuda:3
+model size: 13.112MB
+Done Setup
+train loss after epoch 1 is 0.1639539632750185.
+val loss after epoch 1 is 0.15869587886592615.
+train loss after epoch 2 is 0.14640090283202498.
+val loss after epoch 2 is 0.14343607863006386.
+train loss after epoch 3 is 0.14043624208945976.
+val loss after epoch 3 is 0.13876449997010437.
+train loss after epoch 4 is 0.13801215545911538.
+val loss after epoch 4 is 0.13673853517874426.
+train loss after epoch 5 is 0.13608700235031154.
+val loss after epoch 5 is 0.1352025702919649.
+train loss after epoch 6 is 0.13444297229380983.
+val loss after epoch 6 is 0.13394268561640513.
+train loss after epoch 7 is 0.13313008478205454.
+val loss after epoch 7 is 0.132855041762409.
+train loss after epoch 8 is 0.13203475896857286.
+val loss after epoch 8 is 0.13194794070137583.
+train loss after epoch 9 is 0.13107710804202055.
+val loss after epoch 9 is 0.13113639090696108.
