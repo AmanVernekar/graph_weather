@@ -35,8 +35,7 @@ class ParallelForecaster(torch.nn.Module):
         self.num_steps = num_steps
         self.models = nn.ModuleList
         for i in range(num_steps):
-            self.models.append(
-                GraphWeatherForecaster(
+            module = GraphWeatherForecaster(
                     lat_lons=lat_lons,
                     resolution=resolution,
                     feature_dim=feature_dim,
@@ -54,7 +53,7 @@ class ParallelForecaster(torch.nn.Module):
                     norm_type=norm_type,
                     use_checkpointing=use_checkpointing
                 )
-            )
+            self.models.append(module=module)
 
         self.model_type = model_type
 

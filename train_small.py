@@ -78,7 +78,7 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 
 
-optimizer = optim.AdamW(model.parameters(), lr=1e-5)
+optimizer = optim.AdamW(model.parameters(), lr=lr)
 train_losses = []
 val_losses = []
 for epoch in range(num_epochs):  # loop over the dataset multiple times
