@@ -82,7 +82,7 @@ class ParallelForecaster(torch.nn.Module):
         elif self.model_type == 'simple_attention':
             embedding = [self.models[i](torch.stack([features[i]]).to(features.device))[0] for i in range(self.num_steps)]
             alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))
-            alphas = torch.unsqueeze(alphas, dim=-1)
+            alphas = torch.unsqueeze(alphas.T, dim=-1)
 
             out = torch.mul(alphas, torch.stack(embedding))
             out = torch.sum(out, dim=0)
