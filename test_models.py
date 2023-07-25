@@ -1,6 +1,6 @@
 import torch
 
-filepath = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_single_lr4_100epochs.pt'
+filepath = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_linear_lr4_100epochs.pt'
 model_dict = torch.load(filepath)
 # model_dict['']
 
