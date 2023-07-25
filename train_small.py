@@ -21,7 +21,7 @@ num_epochs = 100
 # start = 1e-6
 # ratio = 100**0.25
 # learning_rates = [start * ratio**i for i in range(n)]
-lr = 1e-5
+lr = 1e-4
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")

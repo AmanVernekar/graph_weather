@@ -83,10 +83,20 @@ class ParallelForecaster(torch.nn.Module):
         elif self.model_type == 'simple_attention':
             embedding = [self.models[i](torch.stack([features[i]]).to(features.device))[0] for i in range(self.num_steps)]
             alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))
+            alphas = torch.unsqueeze(alphas, dim=-1)
 
-            out = torch.zeros(features[0].shape[0], features[0].shape[1]).to(features.device) 
-            for i, coeffs in enumerate(alphas):
-                for j in range(self.num_steps):
-                    out[i] = out[i] + coeffs[j]*embedding[j][i]
+            out = alphas * embedding
+            out = torch.sum(out, dim=0)
+            return out
             
-            return torch.stack([out])
+            # out = torch.zeros(features[0].shape[0], features[0].shape[1]).to(features.device) 
+
+            # # lets say we have M alpahs, and N steps
+            # # you are broadcasting the M alphas to a tensor of size M*N
+
+
+            # for i, coeffs in enumerate(alphas):
+            #     for j in range(self.num_steps):
+            #         out[i] = out[i] + coeffs[j]*embedding[j][i]
+            
+            # return torch.stack([out])
