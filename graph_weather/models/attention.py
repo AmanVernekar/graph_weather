@@ -33,7 +33,7 @@ class ParallelForecaster(torch.nn.Module):
             output_dim = self.feature_dim
 
         self.num_steps = num_steps
-        self.models = nn.ModuleList
+        self.models = nn.ModuleList()
         for i in range(num_steps):
             module = GraphWeatherForecaster(
                     lat_lons=lat_lons,
