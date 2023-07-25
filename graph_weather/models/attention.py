@@ -84,7 +84,7 @@ class ParallelForecaster(torch.nn.Module):
             alphas = self.soft(self.leaky(self.attention_layer(torch.cat(embedding, dim=-1))))
             alphas = torch.unsqueeze(alphas, dim=-1)
 
-            out = torch.mul(alphas, embedding)
+            out = torch.mul(alphas, torch.stack(embedding))
             out = torch.sum(out, dim=0)
             return out
             
