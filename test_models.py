@@ -10,8 +10,8 @@ model_file = sys.argv[1]
 model_type = sys.argv[2]
 num_blocks = int(sys.argv[3])
 cuda_num = sys.argv[4]
-# months = [3,6,9,12]
-months = [1,4,7,10]
+months = [3,6,9,12]
+# months = [1,4,7,10]
 feature_dim = 42
 num_steps = 3
 
