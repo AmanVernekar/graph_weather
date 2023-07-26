@@ -1,39 +1,10 @@
 import torch
 from graph_weather import AnalysisDataset, GraphWeatherForecaster, ParallelDataset, ParallelForecaster
 import numpy as np
-
-
-
-filepath1 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_linear_lr4_100epochs.pt'
-model_dict = torch.load(filepath1)
-print(model_dict)
-print(type(model_dict))
-exit()
-# model_dict['']
-
-print("Model's state_dict:")
-for param_tensor in model_dict:
-    print(param_tensor, "\t", model_dict[param_tensor].size())
-
-
-print("\n\n\n")
-
-filepath2 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_simple_attention_lr0.0001_100epochs.pt'
-model_dict = torch.load(filepath2)
-# model_dict['']
-
-print("Model's state_dict:")
-for param_tensor in model_dict:
-    print(param_tensor, "\t", model_dict[param_tensor].size())
-
-exit()
-
-model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
-model.load_state_dict(torch.load(filepath))
-model.eval()
-
-dataset = []
-outputs = []
+import sys
+import glob
+import xarray as xr
+from torch.utils.data import DataLoader
 
 means = [2.80617824e-06, 5.43949892e-06, 5.89384711e-05, 4.05640756e-04,
          1.57212126e-03, 4.61412586e-03, 6.97914594e-03, 2.11679876e+02,
@@ -71,10 +42,86 @@ stdevs  = [4.18465428e-07, 3.83990121e-06, 7.49772778e-05, 5.33798511e-04,
            6.03232724e+03, 5.63486953e+03, 4.24285376e+03, 2.79031604e+03,
            1.55183194e+03, 1.13716400e+03]
 
-pred_vals = outputs * stdevs + means
-true_vals = dataset * stdevs + means
+model_file = sys.argv[1]
+model_type = sys.argv[2]
+cuda_num = sys.argv[3]
+months = [3,6,9,12]
+feature_dim = 42
+num_steps = 3
+num_blocks = 6
 
-se = (stdevs(outputs - dataset)) ** 2
-mse = np.mean(se, axis=0)
-mse = np.mean(mse, axis=0)
-rmse = mse ** 0.5
+device = torch.device(f"cuda:{cuda_num}" if torch.cuda.is_available() else "cpu")
+print(device)
+
+filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
+coarsen = 8 # change this in preprocessor too if changed here
+data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
+lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
+
+if model_type == 'single':
+    ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in months]
+    model = GraphWeatherForecaster(lat_lons=lat_lons, feature_dim=feature_dim, num_blocks=num_blocks).to(device)
+else:
+    ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in months]
+    model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=feature_dim, model_type=model_type, num_blocks=num_blocks).to(device)
+
+datasets = [DataLoader(ds, batch_size=1, num_workers=32) for ds in ds_list]
+
+model_file = f'/local/scratch-2/asv34/graph_weather/dataset/models/{model_file}'
+model.load_state_dict(torch.load(model_file))
+model.eval()
+
+
+se_list = torch.zeros((2,2,2))
+
+
+for j, dataset in enumerate(datasets):
+    for i, data in enumerate(dataset):
+        # get the inputs; data is a list of [inputs, labels]
+        inputs, labels = data[0].float().to(device), data[1].float().to(device)
+        with torch.no_grad():
+            outputs = model(inputs)
+            se = (stdevs * (outputs - labels)) ** 2
+            print(se.shape)
+            exit()
+
+
+
+
+
+# dataset = []
+# outputs = []
+
+# pred_vals = outputs * stdevs + means
+# true_vals = dataset * stdevs + means
+
+
+# mse = np.mean(se, axis=0)
+# mse = np.mean(mse, axis=0)
+# rmse = mse ** 0.5
+
+
+
+
+
+
+# exit()
+# # model_dict['']
+
+# print("Model's state_dict:")
+# for param_tensor in model_dict:
+#     print(param_tensor, "\t", model_dict[param_tensor].size())
+
+
+# print("\n\n\n")
+
+# filepath2 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_simple_attention_lr0.0001_100epochs.pt'
+# model_dict = torch.load(filepath2)
+# # model_dict['']
+
+# print("Model's state_dict:")
+# for param_tensor in model_dict:
+#     print(param_tensor, "\t", model_dict[param_tensor].size())
+
+# exit()
+
