@@ -74,18 +74,31 @@ model.load_state_dict(torch.load(model_file))
 model.eval()
 
 
-se_list = torch.zeros((2,2,2))
+n = 0
+for ds in ds_list:
+    n += len(ds)
+se_sum = torch.zeros((16380,42))
 
 
+index = 0
 for j, dataset in enumerate(datasets):
     for i, data in enumerate(dataset):
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
         with torch.no_grad():
             outputs = model(inputs)
-            se = (torch.mul(stdevs, outputs - labels)) ** 2
-            print(se.shape)
-            exit()
+            se = ((torch.mul(stdevs, outputs - labels)) ** 2)[0]
+            se_sum = se_sum + se
+
+mse = se_sum/n
+mse = np.mean(mse, axis=0)
+rmse = mse ** 0.5
+
+print('mse is:\n')
+print(mse)
+print('rmse is:\n')
+print(rmse)
+
 
 
 
