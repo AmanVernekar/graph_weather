@@ -7,7 +7,7 @@ import numpy as np
 # from . import const
 
 coarsen = 8 # change this in train_small too if changed here
-train = True
+train = False
 
 datasets = []
 
