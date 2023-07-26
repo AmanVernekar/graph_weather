@@ -11,17 +11,14 @@ import sys
 import matplotlib.pyplot as plt
 
 num_steps = 3
+num_blocks = 6
+feature_dim = 42
 model_type = sys.argv[1]
 cuda_num = sys.argv[2]
+lr = 10 ** (-int(sys.argv[3]))
 train_count = 95
 num_epochs = 100
-
-
-# n = 5
-# start = 1e-6
-# ratio = 100**0.25
-# learning_rates = [start * ratio**i for i in range(n)]
-lr = 1e-4
+months = [1,4,7,10]
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
@@ -35,18 +32,19 @@ print(device)
 
 
 if model_type == 'single':
-    ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in [1,4,7,10]]
-    # model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
+    ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in months]
+    model = GraphWeatherForecaster(lat_lons=lat_lons, feature_dim=feature_dim, num_blocks=num_blocks).to(device)
 else:
-    ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in [1,4,7,10]]
-    # model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
+    ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in months]
+    model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=feature_dim, model_type=model_type, num_blocks=num_blocks).to(device)
 
 
 datasets = [DataLoader(ds, batch_size=1, num_workers=32) for ds in ds_list]
 criterion = NormalizedMSELoss(lat_lons=lat_lons, feature_variance=[1,1], device=device).to(device)
+optimizer = optim.AdamW(model.parameters(), lr=lr)
 
 
-def plot_graph(num_epochs, train_losses, val_losses, model_type, lr, k):
+def plot_graph(num_epochs, train_losses, val_losses, model_type, lr):
     epochs = range(1,num_epochs + 1)
     plt.rcParams['figure.figsize'] = [12, 5]
     fig, (ax1, ax2) = plt.subplots(1, 2)
@@ -56,14 +54,8 @@ def plot_graph(num_epochs, train_losses, val_losses, model_type, lr, k):
     ax1.plot(epochs, train_losses)
     ax2.plot(epochs, val_losses)
     # plt.show()
-    fig.savefig(f'/local/scratch-2/asv34/graph_weather/plots/plot_2022_4months_normed_{model_type}_lr{k}_{num_epochs}epochs.png')
+    fig.savefig(f'/local/scratch-2/asv34/graph_weather/plots/plot_2022_4months_normed_{model_type}_lr{lr}final_{num_epochs}epochs.png')
 
-
-# for k, lr in enumerate(learning_rates):
-if model_type == 'single':
-    model = GraphWeatherForecaster(lat_lons, feature_dim=42, num_blocks=6).to(device)
-else:
-    model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
 
 param_size = 0
 for param in model.parameters():
@@ -78,7 +70,6 @@ print('model size: {:.3f}MB'.format(size_all_mb))
 print("Done Setup")
 
 
-optimizer = optim.AdamW(model.parameters(), lr=lr)
 train_losses = []
 val_losses = []
 for epoch in range(num_epochs):  # loop over the dataset multiple times
@@ -119,6 +110,5 @@ for epoch in range(num_epochs):  # loop over the dataset multiple times
 print(f"Finished Training at {lr=}")
 print(f'train_losses:\n{train_losses}\n')
 print(f'val_losses:\n{val_losses}\n\n')
-plot_graph(num_epochs=num_epochs, train_losses=train_losses, val_losses=val_losses, model_type=model_type, lr=lr, k=lr)
-# torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{k}_{num_epochs}epochs.pt')
-torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{lr}_{num_epochs}epochs.pt')
+plot_graph(num_epochs=num_epochs, train_losses=train_losses, val_losses=val_losses, model_type=model_type, lr=lr)
+torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{lr}final_{num_epochs}epochs.pt')
