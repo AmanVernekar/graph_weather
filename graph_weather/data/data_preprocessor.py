@@ -54,11 +54,11 @@ if train:
     variances = (datasets_np - means)**2
     variances = np.mean(variances, axis=0)
     variances = np.mean(variances, axis=0)
-    stdev = np.sqrt(variances)
+    stdevs = np.sqrt(variances)
 
     print(f'means are {means}\n\n')
     print(f'variances are {variances}\n\n')
-    print(f'stdevs are {stdev}\n\n')
+    print(f'stdevs are {stdevs}\n\n')
 
 else:
     means = [2.80617824e-06, 5.43949892e-06, 5.89384711e-05, 4.05640756e-04,
@@ -98,7 +98,7 @@ else:
             1.55183194e+03, 1.13716400e+03]
 
 for i, dataset in enumerate(datasets):
-    new = (dataset - means)/stdev
+    new = (dataset - means)/stdevs
     month = (i)*3 + 3
     np.save(f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', new) # change dataset back to new
 
