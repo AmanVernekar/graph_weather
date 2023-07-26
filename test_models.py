@@ -44,7 +44,7 @@ stdevs  = [4.18465428e-07, 3.83990121e-06, 7.49772778e-05, 5.33798511e-04,
 
 model_file = sys.argv[1]
 model_type = sys.argv[2]
-num_blocks = sys.argv[3]
+num_blocks = int(sys.argv[3])
 cuda_num = sys.argv[4]
 # months = [3,6,9,12]
 months = [1,4,7,10]
