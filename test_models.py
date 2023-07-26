@@ -1,5 +1,6 @@
 import torch
 from graph_weather import AnalysisDataset, GraphWeatherForecaster, ParallelDataset, ParallelForecaster
+import numpy as np
 
 
 
@@ -15,6 +16,8 @@ model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=4
 model.load_state_dict(torch.load(filepath))
 model.eval()
 
+dataset = []
+outputs = []
 
 means = [2.80617824e-06, 5.43949892e-06, 5.89384711e-05, 4.05640756e-04,
          1.57212126e-03, 4.61412586e-03, 6.97914594e-03, 2.11679876e+02,
@@ -51,3 +54,11 @@ stdevs  = [4.18465428e-07, 3.83990121e-06, 7.49772778e-05, 5.33798511e-04,
            1.63292498e-01, 1.51776531e-01, 1.04199779e-01, 6.43888439e+03,
            6.03232724e+03, 5.63486953e+03, 4.24285376e+03, 2.79031604e+03,
            1.55183194e+03, 1.13716400e+03]
+
+pred_vals = outputs * stdevs + means
+true_vals = dataset * stdevs + means
+
+se = (stdevs(outputs - dataset)) ** 2
+mse = np.mean(se, axis=0)
+mse = np.mean(mse, axis=0)
+rmse = mse ** 0.5
