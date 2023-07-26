@@ -44,12 +44,12 @@ stdevs  = [4.18465428e-07, 3.83990121e-06, 7.49772778e-05, 5.33798511e-04,
 
 model_file = sys.argv[1]
 model_type = sys.argv[2]
-cuda_num = sys.argv[3]
+num_blocks = sys.argv[3]
+cuda_num = sys.argv[4]
 # months = [3,6,9,12]
 months = [1,4,7,10]
 feature_dim = 42
 num_steps = 3
-num_blocks = 6
 
 device = torch.device(f"cuda:{cuda_num}" if torch.cuda.is_available() else "cpu")
 print(device)
@@ -82,7 +82,7 @@ for j, dataset in enumerate(datasets):
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
         with torch.no_grad():
             outputs = model(inputs)
-            se = (stdevs * (outputs - labels)) ** 2
+            se = (torch.mul(stdevs, outputs - labels)) ** 2
             print(se.shape)
             exit()
 
