@@ -6,6 +6,9 @@ import numpy as np
 
 filepath1 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_linear_lr4_100epochs.pt'
 model_dict = torch.load(filepath1)
+print(model_dict)
+print(type(model_dict))
+exit()
 # model_dict['']
 
 print("Model's state_dict:")
