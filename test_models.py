@@ -6,6 +6,18 @@ import glob
 import xarray as xr
 from torch.utils.data import DataLoader
 
+model_file = sys.argv[1]
+model_type = sys.argv[2]
+num_blocks = int(sys.argv[3])
+cuda_num = sys.argv[4]
+# months = [3,6,9,12]
+months = [1,4,7,10]
+feature_dim = 42
+num_steps = 3
+
+device = torch.device(f"cuda:{cuda_num}" if torch.cuda.is_available() else "cpu")
+print(device)
+
 means = [2.80617824e-06, 5.43949892e-06, 5.89384711e-05, 4.05640756e-04,
          1.57212126e-03, 4.61412586e-03, 6.97914594e-03, 2.11679876e+02,
          2.13045460e+02, 2.23016434e+02, 2.42570088e+02, 2.61344528e+02,
@@ -40,19 +52,8 @@ stdevs  = torch.tensor([4.18465428e-07, 3.83990121e-06, 7.49772778e-05, 5.337985
            9.87786063e-03, 3.56042137e-02, 8.43679505e-02, 1.44908923e-01,
            1.63292498e-01, 1.51776531e-01, 1.04199779e-01, 6.43888439e+03,
            6.03232724e+03, 5.63486953e+03, 4.24285376e+03, 2.79031604e+03,
-           1.55183194e+03, 1.13716400e+03])
+           1.55183194e+03, 1.13716400e+03]).to(device)
 
-model_file = sys.argv[1]
-model_type = sys.argv[2]
-num_blocks = int(sys.argv[3])
-cuda_num = sys.argv[4]
-# months = [3,6,9,12]
-months = [1,4,7,10]
-feature_dim = 42
-num_steps = 3
-
-device = torch.device(f"cuda:{cuda_num}" if torch.cuda.is_available() else "cpu")
-print(device)
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
 coarsen = 8 # change this in preprocessor too if changed here
