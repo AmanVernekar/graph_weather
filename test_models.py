@@ -4,13 +4,26 @@ import numpy as np
 
 
 
-filepath = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_linear_lr4_100epochs.pt'
-model_dict = torch.load(filepath)
+filepath1 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_linear_lr4_100epochs.pt'
+model_dict = torch.load(filepath1)
 # model_dict['']
 
 print("Model's state_dict:")
 for param_tensor in model_dict:
     print(param_tensor, "\t", model_dict[param_tensor].size())
+
+
+print("\n\n\n")
+
+filepath2 = '/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_simple_attention_lr0.0001_100epochs.pt'
+model_dict = torch.load(filepath2)
+# model_dict['']
+
+print("Model's state_dict:")
+for param_tensor in model_dict:
+    print(param_tensor, "\t", model_dict[param_tensor].size())
+
+exit()
 
 model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=42, model_type=model_type).to(device)
 model.load_state_dict(torch.load(filepath))
