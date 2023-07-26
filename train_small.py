@@ -54,7 +54,7 @@ def plot_graph(num_epochs, train_losses, val_losses, model_type, lr):
     ax1.plot(epochs, train_losses)
     ax2.plot(epochs, val_losses)
     # plt.show()
-    fig.savefig(f'/local/scratch-2/asv34/graph_weather/plots/plot_2022_4months_normed_{model_type}_lr{lr}final_{num_epochs}epochs.png')
+    fig.savefig(f'/local/scratch-2/asv34/graph_weather/plots/plot_2022_4months_normed_{model_type}_lr{lr}blocks{num_blocks}_{num_epochs}epochs.png')
 
 
 param_size = 0
@@ -111,4 +111,4 @@ print(f"Finished Training at {lr=}")
 print(f'train_losses:\n{train_losses}\n')
 print(f'val_losses:\n{val_losses}\n\n')
 plot_graph(num_epochs=num_epochs, train_losses=train_losses, val_losses=val_losses, model_type=model_type, lr=lr)
-torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{lr}final_{num_epochs}epochs.pt')
+torch.save(model.state_dict(), f'/local/scratch-2/asv34/graph_weather/dataset/models/2022_4months_normed_{model_type}_lr{lr}blocks{num_blocks}_{num_epochs}epochs.pt')
