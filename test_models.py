@@ -77,7 +77,7 @@ model.eval()
 n = 0
 for ds in ds_list:
     n += len(ds)
-se_sum = torch.zeros((16380,42))
+se_sum = torch.zeros((16380,42)).to(device)
 
 
 index = 0
