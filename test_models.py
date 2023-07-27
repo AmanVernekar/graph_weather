@@ -91,7 +91,7 @@ for j, dataset in enumerate(datasets):
             se_sum = se_sum + se
 
 mse = se_sum/n
-mse = np.mean(mse, axis=0)
+mse = np.mean(mse.numpy(), axis=0)
 rmse = mse ** 0.5
 
 print('mse is:\n')
