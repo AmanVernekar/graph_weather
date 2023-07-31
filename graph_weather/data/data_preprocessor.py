@@ -7,12 +7,12 @@ import numpy as np
 # from . import const
 
 coarsen = 8 # change this in train_small too if changed here
-train = False
+train = True
 
 datasets = []
 
-for month in ['03', '06', '09', '12']:
-    filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/2022/2022_{month}*")
+for month in ['01']:
+    filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/uk_2022/2022_{month}*")
     filepaths = sorted(filepaths)
 
     for i, f in enumerate(filepaths):
@@ -100,7 +100,7 @@ else:
 for i, dataset in enumerate(datasets):
     new = (dataset - means)/stdevs
     month = (i)*3 + 3
-    np.save(f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', new) # change dataset back to new
+    np.save(f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy', new) # change dataset back to new
 
 
 

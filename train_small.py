@@ -18,10 +18,10 @@ cuda_num = sys.argv[2]
 lr = 10 ** (-int(sys.argv[3]))
 train_count = 95
 num_epochs = 100
-months = [1,4,7,10]
+months = [1] #[1,4,7,10]
 
 
-filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/2022/*")
+filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/uk_2022/*")
 coarsen = 8 # change this in preprocessor too if changed here
 data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
@@ -32,10 +32,10 @@ print(device)
 
 
 if model_type == 'single':
-    ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in months]
+    ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy') for month in months]
     model = GraphWeatherForecaster(lat_lons=lat_lons, feature_dim=feature_dim, num_blocks=num_blocks).to(device)
 else:
-    ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy', num_steps=num_steps) for month in months]
+    ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy', num_steps=num_steps) for month in months]
     model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=feature_dim, model_type=model_type, num_blocks=num_blocks).to(device)
 
 
