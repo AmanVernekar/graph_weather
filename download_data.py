@@ -29,8 +29,8 @@ for year in [2022]:
                             'area': uk_area,
                             'format': 'netcdf',
                         },
-                        f'/local/scratch-2/asv34/graph_weather/dataset/2022/download_air.nc')
-                    data = xr.open_dataset("/local/scratch-2/asv34/graph_weather/dataset/2022/download_air.nc", engine="netcdf4")
+                        f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022/download_air.nc')
+                    data = xr.open_dataset("/local/scratch-2/asv34/graph_weather/dataset/uk_2022/download_air.nc", engine="netcdf4")
                     #print(data)
                     encoding = {var: {"compressor": numcodecs.get_codec(dict(id="zlib", level=5))} for var in data.data_vars}
                     d = data.chunk({"time": 1})
