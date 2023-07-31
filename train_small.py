@@ -18,7 +18,7 @@ cuda_num = sys.argv[2]
 lr = 10 ** (-int(sys.argv[3]))
 train_count = 95
 num_epochs = 100
-months = [1] #[1,4,7,10]
+months = [3] #[1,4,7,10]
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/uk_2022/*")
