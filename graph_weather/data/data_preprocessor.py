@@ -6,7 +6,7 @@ import numpy as np
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-coarsen = 8 # change this in train_small too if changed here
+coarsen = 1 # change this in train_small too if changed here
 train = True
 
 datasets = []

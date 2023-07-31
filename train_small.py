@@ -22,7 +22,7 @@ months = [1] #[1,4,7,10]
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/uk_2022/*")
-coarsen = 8 # change this in preprocessor too if changed here
+coarsen = 1 # change this in preprocessor too if changed here
 data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
 
