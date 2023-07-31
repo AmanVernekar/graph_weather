@@ -60,6 +60,12 @@ coarsen = 8 # change this in preprocessor too if changed here
 data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, boundary="pad").mean().coarsen(longitude=coarsen).mean()
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
 
+weights = []
+for lat, lon in lat_lons:
+    weights.append(np.cos(lat * np.pi / 180.0))
+weights = torch.tensor(weights, dtype=torch.float)
+assert not torch.isnan(weights).any()
+
 if model_type == 'single':
     ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/2022_{month}_normed.npy') for month in months]
     model = GraphWeatherForecaster(lat_lons=lat_lons, feature_dim=feature_dim, num_blocks=num_blocks).to(device)
@@ -88,6 +94,7 @@ for j, dataset in enumerate(datasets):
         with torch.no_grad():
             outputs = model(inputs)
             se = ((torch.mul(stdevs, outputs - labels)) ** 2)[0]
+            se = torch.mul(weights, se)
             se_sum = se_sum + se
 
 mse = se_sum/n

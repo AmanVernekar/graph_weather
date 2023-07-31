@@ -4,10 +4,11 @@ import zarr
 import numcodecs
 
 c = cdsapi.Client()
+uk_area = [63, -10, 47, 4]
 
 for year in [2022]:
-    for month in [3, 6, 9, 12]:
-        for day in range(1,31):
+    for month in [1]:
+        for day in range(1,6): #change back to 32
             for time in ['00:00', '06:00', '12:00', '18:00']:
                 try:
                     c.retrieve(
@@ -25,6 +26,7 @@ for year in [2022]:
                             'month': str(month).zfill(2),
                             'day': str(day).zfill(2),
                             'time': time,
+                            'area': uk_area,
                             'format': 'netcdf',
                         },
                         f'/local/scratch-2/asv34/graph_weather/dataset/2022/download_air.nc')
@@ -32,7 +34,7 @@ for year in [2022]:
                     #print(data)
                     encoding = {var: {"compressor": numcodecs.get_codec(dict(id="zlib", level=5))} for var in data.data_vars}
                     d = data.chunk({"time": 1})
-                    with zarr.ZipStore(f'/local/scratch-2/asv34/graph_weather/dataset/2022/{year}_{str(month).zfill(2)}_{str(day).zfill(2)}_{time[:2]}.zarr.zip', mode='w') as store:
+                    with zarr.ZipStore(f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022/{year}_{str(month).zfill(2)}_{str(day).zfill(2)}_{time[:2]}.zarr.zip', mode='w') as store:
                         d.to_zarr(store, encoding=encoding, compute=True)
                 except:
                     continue
