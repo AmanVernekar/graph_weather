@@ -4,7 +4,7 @@ from typing import Optional
 import torch
 from huggingface_hub import PyTorchModelHubMixin
 
-from graph_weather.models import Decoder, Encoder, Processor
+from graph_weather.models import Decoder, Encoder, Processor, RegionEncoder
 
 
 class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
@@ -13,6 +13,7 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
     def __init__(
         self,
         lat_lons: list,
+        regional: bool = False,
         resolution: int = 2,
         feature_dim: int = 42, #TODO change back to 78
         aux_dim: int = 0, #TODO change back to 24
@@ -58,19 +59,34 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         if output_dim is None:
             output_dim = self.feature_dim
 
-        self.encoder = Encoder(
-            lat_lons=lat_lons,
-            resolution=resolution,
-            input_dim=feature_dim + aux_dim,
-            output_dim=node_dim,
-            output_edge_dim=edge_dim,
-            hidden_dim_processor_edge=hidden_dim_processor_edge,
-            hidden_layers_processor_node=hidden_layers_processor_node,
-            hidden_dim_processor_node=hidden_dim_processor_node,
-            hidden_layers_processor_edge=hidden_layers_processor_edge,
-            mlp_norm_type=norm_type,
-            use_checkpointing=use_checkpointing,
-        )
+        if regional:
+            self.encoder = RegionEncoder(
+                lat_lons=lat_lons,
+                resolution=resolution,
+                input_dim=feature_dim + aux_dim,
+                output_dim=node_dim,
+                output_edge_dim=edge_dim,
+                hidden_dim_processor_edge=hidden_dim_processor_edge,
+                hidden_layers_processor_node=hidden_layers_processor_node,
+                hidden_dim_processor_node=hidden_dim_processor_node,
+                hidden_layers_processor_edge=hidden_layers_processor_edge,
+                mlp_norm_type=norm_type,
+                use_checkpointing=use_checkpointing,
+            )
+        else:
+            self.encoder = Encoder(
+                lat_lons=lat_lons,
+                resolution=resolution,
+                input_dim=feature_dim + aux_dim,
+                output_dim=node_dim,
+                output_edge_dim=edge_dim,
+                hidden_dim_processor_edge=hidden_dim_processor_edge,
+                hidden_layers_processor_node=hidden_layers_processor_node,
+                hidden_dim_processor_node=hidden_dim_processor_node,
+                hidden_layers_processor_edge=hidden_layers_processor_edge,
+                mlp_norm_type=norm_type,
+                use_checkpointing=use_checkpointing,
+            )
         self.processor = Processor(
             input_dim=node_dim,
             edge_dim=edge_dim,

@@ -32,7 +32,7 @@ from torch_geometric.data import Data
 from graph_weather.models.layers.graph_net_block import MLP, GraphProcessor
 
 
-class Encoder(torch.nn.Module):
+class RegionEncoder(torch.nn.Module):
     """Encoder graph model"""
 
     def __init__(
@@ -70,18 +70,18 @@ class Encoder(torch.nn.Module):
         self.use_checkpointing = use_checkpointing
         self.output_dim = output_dim
         self.num_latlons = len(lat_lons)
-        self.base_h3_grid = sorted(list(h3.uncompact(h3.get_res0_indexes(), resolution)))
-        self.base_h3_map = {h_i: i for i, h_i in enumerate(self.base_h3_grid)}
-        self.h3_grid = [h3.geo_to_h3(lat, lon, resolution) for lat, lon in lat_lons]
+        # self.base_h3_grid = sorted(list(h3.uncompact(h3.get_res0_indexes(), resolution)))
 
-        self.unique_h3_grid = []
+        self.h3_grid = [h3.geo_to_h3(lat, lon, resolution) for lat, lon in lat_lons]
+        self.base_h3_grid = []
         for i in self.h3_grid:
-            if i not in self.unique_h3_grid:
-                self.unique_h3_grid.append(i)
+            if i not in self.base_h3_grid:
+                self.base_h3_grid.append(i)
+        self.base_h3_map = {h_i: i for i, h_i in enumerate(self.base_h3_grid)}
 
         self.h3_mapping = {}
         h_index = len(self.base_h3_grid)
-        for h in self.unique_h3_grid:
+        for h in self.base_h3_grid:
             if h not in self.h3_mapping:
                 h_index -= 1
                 self.h3_mapping[h] = h_index + self.num_latlons
@@ -98,8 +98,11 @@ class Encoder(torch.nn.Module):
         # Build the default graph
         # lat_nodes = torch.zeros((len(lat_lons_heights), input_dim), dtype=torch.float)
         # h3_nodes = torch.zeros((h3.num_hexagons(resolution), output_dim), dtype=torch.float)
+        # nodes = torch.zeros(
+        #     (len(lat_lons) + h3.num_hexagons(resolution), input_dim), dtype=torch.float
+        # )
         nodes = torch.zeros(
-            (len(lat_lons) + h3.num_hexagons(resolution), input_dim), dtype=torch.float
+            (len(lat_lons) + len(self.base_h3_grid), input_dim), dtype=torch.float
         )
         # Get connections between lat nodes and h3 nodes
         edge_sources = []
@@ -116,7 +119,7 @@ class Encoder(torch.nn.Module):
 
         # Extra starting ones for appending to inputs, could 'learn' good starting points
         self.h3_nodes = torch.nn.Parameter(
-            torch.zeros((h3.num_hexagons(resolution), input_dim), dtype=torch.float, device='cuda')
+            torch.zeros((len(self.base_h3_grid), input_dim), dtype=torch.float, device='cuda')
         )
         # self.h3_nodes = self.h3_nodes.to(torch.device('cuda'))
         # Output graph

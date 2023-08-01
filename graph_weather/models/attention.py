@@ -9,6 +9,7 @@ class ParallelForecaster(torch.nn.Module):
         lat_lons: list,
         model_type: str,
         num_steps:int = 2,
+        regional: bool = False,
         resolution: int = 2,
         feature_dim: int = 42, #TODO change back to 78
         aux_dim: int = 0, #TODO change back to 24
@@ -38,6 +39,7 @@ class ParallelForecaster(torch.nn.Module):
             module = GraphWeatherForecaster(
                     lat_lons=lat_lons,
                     resolution=resolution,
+                    regional=regional,
                     feature_dim=feature_dim,
                     aux_dim=aux_dim,
                     output_dim=output_dim,

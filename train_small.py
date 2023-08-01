@@ -19,6 +19,7 @@ lr = 10 ** (-int(sys.argv[3]))
 train_count = 95
 num_epochs = 100
 months = [3] #[1,4,7,10]
+regional = True
 
 
 filepaths = glob.glob("/local/scratch-2/asv34/graph_weather/dataset/uk_2022/*")
@@ -33,10 +34,10 @@ print(device)
 
 if model_type == 'single':
     ds_list = [AnalysisDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy') for month in months]
-    model = GraphWeatherForecaster(lat_lons=lat_lons, feature_dim=feature_dim, num_blocks=num_blocks).to(device)
+    model = GraphWeatherForecaster(lat_lons=lat_lons, regional=regional,  feature_dim=feature_dim, num_blocks=num_blocks).to(device)
 else:
     ds_list = [ParallelDataset(np_file=f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy', num_steps=num_steps) for month in months]
-    model = ParallelForecaster(lat_lons=lat_lons, num_steps=num_steps, feature_dim=feature_dim, model_type=model_type, num_blocks=num_blocks).to(device)
+    model = ParallelForecaster(lat_lons=lat_lons, regional=regional, num_steps=num_steps, feature_dim=feature_dim, model_type=model_type, num_blocks=num_blocks).to(device)
 
 
 datasets = [DataLoader(ds, batch_size=1, num_workers=32) for ds in ds_list]
