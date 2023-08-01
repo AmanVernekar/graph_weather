@@ -4,7 +4,7 @@ from typing import Optional
 import torch
 from huggingface_hub import PyTorchModelHubMixin
 
-from graph_weather.models import Decoder, Encoder, Processor, RegionEncoder
+from graph_weather.models import Decoder, Encoder, Processor, RegionEncoder, RegionDecoder
 
 
 class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
@@ -97,21 +97,38 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
             hidden_layers_processor_edge=hidden_layers_processor_edge,
             mlp_norm_type=norm_type,
         )
-        self.decoder = Decoder(
-            lat_lons=lat_lons,
-            resolution=resolution,
-            input_dim=node_dim,
-            output_dim=output_dim,
-            output_edge_dim=edge_dim,
-            hidden_dim_processor_edge=hidden_dim_processor_edge,
-            hidden_layers_processor_node=hidden_layers_processor_node,
-            hidden_dim_processor_node=hidden_dim_processor_node,
-            hidden_layers_processor_edge=hidden_layers_processor_edge,
-            mlp_norm_type=norm_type,
-            hidden_dim_decoder=hidden_dim_decoder,
-            hidden_layers_decoder=hidden_layers_decoder,
-            use_checkpointing=use_checkpointing,
-        )
+        if regional:
+            self.decoder = RegionDecoder(
+                lat_lons=lat_lons,
+                resolution=resolution,
+                input_dim=node_dim,
+                output_dim=output_dim,
+                output_edge_dim=edge_dim,
+                hidden_dim_processor_edge=hidden_dim_processor_edge,
+                hidden_layers_processor_node=hidden_layers_processor_node,
+                hidden_dim_processor_node=hidden_dim_processor_node,
+                hidden_layers_processor_edge=hidden_layers_processor_edge,
+                mlp_norm_type=norm_type,
+                hidden_dim_decoder=hidden_dim_decoder,
+                hidden_layers_decoder=hidden_layers_decoder,
+                use_checkpointing=use_checkpointing,
+            )
+        else:
+            self.decoder = Decoder(
+                lat_lons=lat_lons,
+                resolution=resolution,
+                input_dim=node_dim,
+                output_dim=output_dim,
+                output_edge_dim=edge_dim,
+                hidden_dim_processor_edge=hidden_dim_processor_edge,
+                hidden_layers_processor_node=hidden_layers_processor_node,
+                hidden_dim_processor_node=hidden_dim_processor_node,
+                hidden_layers_processor_edge=hidden_layers_processor_edge,
+                mlp_norm_type=norm_type,
+                hidden_dim_decoder=hidden_dim_decoder,
+                hidden_layers_decoder=hidden_layers_decoder,
+                use_checkpointing=use_checkpointing,
+            )
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
         """
