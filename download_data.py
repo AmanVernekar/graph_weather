@@ -7,8 +7,8 @@ c = cdsapi.Client()
 uk_area = [63, -10, 47, 4]
 
 for year in [2022]:
-    for month in [1]:
-        for day in range(1,6): #change back to 32
+    for month in [1, 4, 7, 10]:
+        for day in range(1,32):
             for time in ['00:00', '06:00', '12:00', '18:00']:
                 try:
                     c.retrieve(
