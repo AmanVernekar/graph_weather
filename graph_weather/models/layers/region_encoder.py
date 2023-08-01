@@ -223,10 +223,11 @@ class RegionEncoder(torch.nn.Module):
         for h3_index in self.base_h3_grid:
             h_points = h3.k_ring(h3_index, 1)
             for h in h_points:  # Already includes itself
-                distance = h3.point_dist(h3.h3_to_geo(h3_index), h3.h3_to_geo(h), unit="rads")
-                edge_attrs.append([np.sin(distance), np.cos(distance)])
-                edge_sources.append(self.base_h3_map[h3_index])
-                edge_targets.append(self.base_h3_map[h])
+                if h in self.base_h3_map.keys():
+                    distance = h3.point_dist(h3.h3_to_geo(h3_index), h3.h3_to_geo(h), unit="rads")
+                    edge_attrs.append([np.sin(distance), np.cos(distance)])
+                    edge_sources.append(self.base_h3_map[h3_index])
+                    edge_targets.append(self.base_h3_map[h])
         edge_index = torch.tensor([edge_sources, edge_targets], dtype=torch.long)
         edge_attrs = torch.tensor(edge_attrs, dtype=torch.float)
         # Use heterogeneous graph as input and output dims are not same for the encoder
