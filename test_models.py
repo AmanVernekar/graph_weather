@@ -10,7 +10,7 @@ model_file = sys.argv[1]
 model_type = sys.argv[2]
 num_blocks = int(sys.argv[3])
 cuda_num = sys.argv[4]
-months = [3,6,9,12]
+months = [3] # [3,6,9,12]
 # months = [1,4,7,10]
 feature_dim = 42
 num_steps = 3
@@ -61,8 +61,12 @@ data = xr.open_zarr(filepaths[0], consolidated=True).coarsen(latitude=coarsen, b
 lat_lons = np.array(np.meshgrid(data.latitude.values, data.longitude.values)).T.reshape(-1, 2)
 
 weights = []
+# [63, -10, 47, 4]
 for lat, lon in lat_lons:
-    weights.append(np.cos(lat * np.pi / 180.0))
+    if (lat > 46 and lat < 64) and (lon > -11 and lon < 5):
+        weights.append(np.cos(lat * np.pi / 180.0))
+    else:
+        weights.append(0)
 weights = torch.tensor(weights, dtype=torch.float)
 assert not torch.isnan(weights).any()
 
@@ -93,12 +97,17 @@ for j, dataset in enumerate(datasets):
         inputs, labels = data[0].float().to(device), data[1].float().to(device)
         with torch.no_grad():
             outputs = model(inputs)
-            se = ((torch.mul(stdevs, outputs - labels)) ** 2)[0]
+            # se = ((torch.mul(stdevs, (outputs - labels)[0])) ** 2)
+            se = ((outputs - labels)[0] ** 2)
             se = torch.mul(weights, se)
             se_sum = se_sum + se
 
 mse = se_sum/n
-mse = np.mean(mse.cpu().numpy(), axis=0)
+mse = mse.cpu().numpy()
+mse = np.true_divide(mse.sum(0),(mse!=0).sum(0))
+# mse = np.mean(mse.cpu().numpy(), axis=0)
+loss = mse.mean()
+print(f'{loss=}\n')
 rmse = mse ** 0.5
 
 print('mse is:\n')
