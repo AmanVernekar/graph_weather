@@ -98,7 +98,7 @@ for j, dataset in enumerate(datasets):
         with torch.no_grad():
             outputs = model(inputs)
             # se = ((torch.mul(stdevs, (outputs - labels)[0])) ** 2)
-            se = ((outputs - labels)[0] ** 2)
+            se = ((outputs - labels) ** 2)
             se = torch.mul(weights, se)
             se_sum = se_sum + se
 
