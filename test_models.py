@@ -101,7 +101,7 @@ for j, dataset in enumerate(datasets):
             se = ((outputs - labels) ** 2)[0]
             print(se.shape)
             print(weights.shape)
-            se = torch.mul(se.T.to(device), weights)
+            se = torch.mul(se.T.to(device), weights.to(device))
             se = se.T
             print(se.shape)
             se_sum = se_sum + se
