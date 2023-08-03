@@ -10,7 +10,7 @@ model_file = sys.argv[1]
 model_type = sys.argv[2]
 num_blocks = int(sys.argv[3])
 cuda_num = sys.argv[4]
-months = [3] # [3,6,9,12]
+months = [3,6,9,12] # [3,6,9,12]
 # months = [1,4,7,10]
 feature_dim = 42
 num_steps = 3
@@ -99,11 +99,8 @@ for j, dataset in enumerate(datasets):
             outputs = model(inputs)
             # se = ((torch.mul(stdevs, (outputs - labels)[0])) ** 2)
             se = ((outputs - labels) ** 2)[0]
-            print(se.shape)
-            print(weights.shape)
             se = torch.mul(se.T.to(device), weights.to(device))
             se = se.T
-            print(se.shape)
             se_sum = se_sum + se
 
 mse = se_sum/n
