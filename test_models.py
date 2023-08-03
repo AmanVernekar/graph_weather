@@ -99,6 +99,8 @@ for j, dataset in enumerate(datasets):
             outputs = model(inputs)
             # se = ((torch.mul(stdevs, (outputs - labels)[0])) ** 2)
             se = ((outputs - labels) ** 2)
+            print(se.shape)
+            print(weights.shape)
             se = torch.mul(weights, se)
             se_sum = se_sum + se
 
