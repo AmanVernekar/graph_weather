@@ -30,6 +30,10 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         #norm_type = None,
         norm_type: str = "LayerNorm",
         use_checkpointing: bool = False,
+        attention_type = None,
+        num_node_heads = 8,
+        num_edge_heads = 8,
+        is_last_model = True
     ):
         """
         Graph Weather Model based off https://arxiv.org/pdf/2202.07575.pdf
@@ -56,6 +60,10 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
         """
         super().__init__()
         self.feature_dim = feature_dim
+        self.attention_type = attention_type
+        self.is_last_model = is_last_model
+
+
         if output_dim is None:
             output_dim = self.feature_dim
 
@@ -87,6 +95,7 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
                 mlp_norm_type=norm_type,
                 use_checkpointing=use_checkpointing,
             )
+        
         self.processor = Processor(
             input_dim=node_dim,
             edge_dim=edge_dim,
@@ -96,41 +105,48 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
             hidden_dim_processor_node=hidden_dim_processor_node,
             hidden_layers_processor_edge=hidden_layers_processor_edge,
             mlp_norm_type=norm_type,
+            attention_type=attention_type,
+            num_node_heads=num_node_heads,
+            num_edge_heads=num_edge_heads
         )
-        if regional:
-            self.decoder = RegionDecoder(
-                lat_lons=lat_lons,
-                resolution=resolution,
-                input_dim=node_dim,
-                output_dim=output_dim,
-                output_edge_dim=edge_dim,
-                hidden_dim_processor_edge=hidden_dim_processor_edge,
-                hidden_layers_processor_node=hidden_layers_processor_node,
-                hidden_dim_processor_node=hidden_dim_processor_node,
-                hidden_layers_processor_edge=hidden_layers_processor_edge,
-                mlp_norm_type=norm_type,
-                hidden_dim_decoder=hidden_dim_decoder,
-                hidden_layers_decoder=hidden_layers_decoder,
-                use_checkpointing=use_checkpointing,
-            )
-        else:
-            self.decoder = Decoder(
-                lat_lons=lat_lons,
-                resolution=resolution,
-                input_dim=node_dim,
-                output_dim=output_dim,
-                output_edge_dim=edge_dim,
-                hidden_dim_processor_edge=hidden_dim_processor_edge,
-                hidden_layers_processor_node=hidden_layers_processor_node,
-                hidden_dim_processor_node=hidden_dim_processor_node,
-                hidden_layers_processor_edge=hidden_layers_processor_edge,
-                mlp_norm_type=norm_type,
-                hidden_dim_decoder=hidden_dim_decoder,
-                hidden_layers_decoder=hidden_layers_decoder,
-                use_checkpointing=use_checkpointing,
-            )
+        
+        if is_last_model:
+            if regional:
+                self.decoder = RegionDecoder(
+                    lat_lons=lat_lons,
+                    resolution=resolution,
+                    input_dim=node_dim,
+                    output_dim=output_dim,
+                    output_edge_dim=edge_dim,
+                    hidden_dim_processor_edge=hidden_dim_processor_edge,
+                    hidden_layers_processor_node=hidden_layers_processor_node,
+                    hidden_dim_processor_node=hidden_dim_processor_node,
+                    hidden_layers_processor_edge=hidden_layers_processor_edge,
+                    mlp_norm_type=norm_type,
+                    hidden_dim_decoder=hidden_dim_decoder,
+                    hidden_layers_decoder=hidden_layers_decoder,
+                    use_checkpointing=use_checkpointing,
+                )
+            else:
+                self.decoder = Decoder(
+                    lat_lons=lat_lons,
+                    resolution=resolution,
+                    input_dim=node_dim,
+                    output_dim=output_dim,
+                    output_edge_dim=edge_dim,
+                    hidden_dim_processor_edge=hidden_dim_processor_edge,
+                    hidden_layers_processor_node=hidden_layers_processor_node,
+                    hidden_dim_processor_node=hidden_dim_processor_node,
+                    hidden_layers_processor_edge=hidden_layers_processor_edge,
+                    mlp_norm_type=norm_type,
+                    hidden_dim_decoder=hidden_dim_decoder,
+                    hidden_layers_decoder=hidden_layers_decoder,
+                    use_checkpointing=use_checkpointing,
+                )
 
-    def forward(self, features: torch.Tensor) -> torch.Tensor:
+
+
+    def forward(self, features: torch.Tensor, attention_matrix=None) -> torch.Tensor:
         """
         Compute the new state of the forecast
 
@@ -141,6 +157,7 @@ class GraphWeatherForecaster(torch.nn.Module, PyTorchModelHubMixin):
             The next state in the forecast
         """
         x, edge_idx, edge_attr = self.encoder(features)
-        x = self.processor(x, edge_idx, edge_attr)
-        x = self.decoder(x, features[..., : self.feature_dim])
+        x = self.processor(x, edge_idx, edge_attr, attention_matrix)
+        if self.is_last_model:
+            x = self.decoder(x, features[..., : self.feature_dim])
         return x

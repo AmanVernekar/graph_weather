@@ -13,7 +13,7 @@ from graph_weather.models.layers.graph_net_block import GraphProcessor
 
 
 class Processor(torch.nn.Module):
-    """Processor for latent graphD"""
+    """Processor for latent graph"""
 
     def __init__(
         self,
@@ -25,6 +25,9 @@ class Processor(torch.nn.Module):
         hidden_layers_processor_node: int = 2,
         hidden_layers_processor_edge: int = 2,
         mlp_norm_type: str = "LayerNorm",
+        attention_type = None,
+        num_node_heads = 8,
+        num_edge_heads = 8
     ):
         """
         Latent graph processor
@@ -54,9 +57,12 @@ class Processor(torch.nn.Module):
             hidden_layers_processor_node,
             hidden_layers_processor_edge,
             mlp_norm_type,
+            attention_type,
+            num_node_heads,
+            num_edge_heads
         )
 
-    def forward(self, x: torch.Tensor, edge_index, edge_attr) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, edge_index, edge_attr, attention_matrix=None) -> torch.Tensor:
         """
         Adds features to the encoding graph
 
@@ -68,5 +74,5 @@ class Processor(torch.nn.Module):
         Returns:
             torch Tensor containing the values of the nodes of the graph
         """
-        out, _ = self.graph_processor(x, edge_index, edge_attr)
+        out, _ = self.graph_processor(x, edge_index, edge_attr, attention_matrix)
         return out

@@ -11,7 +11,6 @@ from torch import cat, nn
 from torch.utils.checkpoint import checkpoint
 from torch_geometric.nn import MetaLayer
 from torch_scatter import scatter_sum
-import math
 
 
 class MLP(nn.Module):
@@ -132,7 +131,7 @@ class EdgeProcessor(nn.Module):
             [src, dest, edge_attr], -1
         )  # concatenate source node, destination node, and edge embeddings
         out = self.edge_mlp(out)
-        # out += edge_attr  # residual connection
+        out += edge_attr  # residual connection
 
         return out
 
@@ -185,7 +184,7 @@ class NodeProcessor(nn.Module):
         out = scatter_sum(edge_attr, col, dim=0)  # aggregate edge message by target
         out = cat([x, out], dim=-1)
         out = self.node_mlp(out)
-        # out += x  # residual connection
+        out += x  # residual connection
 
         return out
 
@@ -238,9 +237,6 @@ class GraphProcessor(nn.Module):
         hidden_layers_node: int = 2,
         hidden_layers_edge: int = 2,
         norm_type: str = "LayerNorm",
-        attention_type = None,
-        num_node_heads = 8,
-        num_edge_heads = 8
     ):
         """
         Graph Processor
@@ -258,11 +254,6 @@ class GraphProcessor(nn.Module):
         """
 
         super(GraphProcessor, self).__init__()
-        self.attention_type = attention_type
-        self.num_node_heads = num_node_heads
-        self.num_edge_heads = num_edge_heads
-        self.dim_node_k = in_dim_node/num_node_heads
-        self.dim_edge_k = in_dim_edge/num_edge_heads
 
         self.blocks = nn.ModuleList()
         for _ in range(mp_iterations):
@@ -277,31 +268,9 @@ class GraphProcessor(nn.Module):
                     norm_type,
                 )
             )
-        
-        if attention_type == 'vector':
-            self.node_q_heads = nn.ModuleList()
-            self.node_k_heads = nn.ModuleList()
-            self.node_v_heads = nn.ModuleList()
-            # self.edge_q_heads = nn.ModuleList()
-            # self.edge_k_heads = nn.ModuleList()
-            # self.edge_v_heads = nn.ModuleList()
-
-            for _ in range(num_node_heads):
-                self.node_q_heads.append(nn.Linear(in_dim_node, in_dim_node/num_node_heads, False))
-                self.node_k_heads.append(nn.Linear(in_dim_node, in_dim_node/num_node_heads, False))
-                self.node_v_heads.append(nn.Linear(in_dim_node, in_dim_node/num_node_heads, False))
-            # for _ in range(num_edge_heads):
-            #     self.edge_q_heads.append(nn.Linear(in_dim_edge, in_dim_edge/num_edge_heads, False))
-            #     self.edge_k_heads.append(nn.Linear(in_dim_edge, in_dim_edge/num_edge_heads, False))
-            #     self.edge_v_heads.append(nn.Linear(in_dim_edge, in_dim_edge/num_edge_heads, False))
-            
-            self.soft = nn.Softmax(1)
-            self.final_node_proj = nn.Linear(in_dim_node, in_dim_node, False)            
-            # self.final_edge_proj = nn.Linear(in_dim_edge, in_dim_edge, False)
-        
 
     def forward(
-        self, x: torch.Tensor, edge_index: torch.Tensor, edge_attr: torch.Tensor, attention_matrix=None
+        self, x: torch.Tensor, edge_index: torch.Tensor, edge_attr: torch.Tensor
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Compute updates to the graph in message passing method
@@ -314,46 +283,7 @@ class GraphProcessor(nn.Module):
         Returns:
             Updated nodes and edge attributes
         """
-        self.attention_matrix = attention_matrix
         for block in self.blocks:
-            out_x, out_edge_attr, _ = block(x, edge_index, edge_attr)
-            if self.attention_type == 'vector':
-                out_node = []
-                # out_edge = []
-                
-                for i in range(self.num_node_heads):
-                    out_node.append(self.attention(head_num=i, node=True, x=out_x))
-                # for i in range(self.num_edge_heads):
-                #     out_edge.append(self.attention(head_num=i, node=False, x=out_edge_attr))
+            x, edge_attr, _ = block(x, edge_index, edge_attr)
 
-                out_x = torch.cat(out_node, 1)
-                # out_edge_attr = torch.cat(out_edge, 1)
-
-                out_x = self.final_node_proj(out_x)
-                # out_edge_attr = self.final_edge_proj(out_edge_attr)               
-
-            out_x += x
-            out_edge_attr += edge_attr
-        return out_x, out_edge_attr
-    
-
-    def attention(self, head_num, node, x):
-        if node:
-            q_matrix = self.node_q_heads[head_num]
-            k_matrix = self.node_k_heads[head_num]
-            v_matrix = self.node_v_heads[head_num]
-            dim_k = self.dim_node_k
-        else:
-            q_matrix = self.edge_q_heads[head_num]
-            k_matrix = self.edge_k_heads[head_num]
-            v_matrix = self.edge_v_heads[head_num]
-            dim_k = self.dim_edge_k
-        
-        q = q_matrix(self.attention_matrix)
-        k = k_matrix(x)
-        v = v_matrix(x)
-
-        out = torch.matmul(q, k.T)/math.sqrt(dim_k)
-        out = self.soft(out)
-        out = torch.matmul(out, v)
-        return out
+        return x, edge_attr

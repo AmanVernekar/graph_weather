@@ -7,3 +7,4 @@ from .layers.encoder import Encoder
 from .layers.processor import Processor
 from .layers.region_encoder import RegionEncoder
 from .layers.region_decoder import RegionDecoder
+from .layers.graph_pool import Graph2Vec, DiffPool

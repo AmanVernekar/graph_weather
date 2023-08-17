@@ -33,7 +33,6 @@ class AnalysisDataset(Dataset):
         return self.dataset[item], self.dataset[item + 1]
 
 
-
 class ParallelDataset(Dataset):
     def __init__(self, np_file, num_steps):  # filepaths, invariant_path, mean, std, coarsen: int = 8
         super().__init__()
@@ -49,6 +48,29 @@ class ParallelDataset(Dataset):
             features.append(self.dataset[i])
         return torch.stack(features), self.dataset[item + self.num_steps]
 
+
+class MultiResoDataset(Dataset):
+    def __init__(self, np_files, global_gap=1, europe_gap=1, uk_gap=1):
+        super().__init__()
+        self.global_dataset = torch.from_numpy(np.load(np_files[0]))
+        self.europe_dataset = torch.from_numpy(np.load(np_files[1]))
+        self.uk_dataset = torch.from_numpy(np.load(np_files[2]))
+        assert self.global_dataset.shape[0] == self.europe_dataset.shape[0] == self.uk_dataset.shape[0]
+
+        self.global_gap = global_gap
+        self.europe_gap = europe_gap
+        self.uk_gap = uk_gap
+    
+    def __len__(self):
+        return self.global_dataset.shape[0] - self.global_gap
+    
+    def __getitem__(self, item):
+        features = [
+            self.global_dataset[item],
+            self.europe_dataset[item + self.global_gap - self.europe_gap],
+            self.uk_dataset[item + self.global_gap - self.uk_gap]
+            ]
+        return features, self.uk_dataset[item + self.global_gap - self.uk_gap + 1]
 
 
 

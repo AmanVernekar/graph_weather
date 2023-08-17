@@ -186,15 +186,15 @@ class Encoder(torch.nn.Module):
         out = einops.rearrange(out, "(b n) f -> b n f", b=batch_size)
         _, out = torch.split(out, [self.num_latlons, self.h3_nodes.shape[0]], dim=1)
         out = einops.rearrange(out, "b n f -> (b n) f")
+        self.edge_idx = torch.cat(
+            [
+                self.latent_graph.edge_index + i * torch.max(self.latent_graph.edge_index) + i 
+                for i in range(batch_size)], 
+                dim=1
+            )
         return (
             out,
-            torch.cat(
-                [
-                    self.latent_graph.edge_index + i * torch.max(self.latent_graph.edge_index) + i
-                    for i in range(batch_size)
-                ],
-                dim=1,
-            ),
+            self.edge_idx,
             self.latent_edge_encoder(
                 einops.repeat(self.latent_graph.edge_attr, "e f -> (repeat e) f", repeat=batch_size)
             ),
