@@ -25,7 +25,7 @@ for month in months:
                 xr.open_zarr(f, consolidated=True)
                 .coarsen(latitude=coarsen, boundary="pad")
                 .mean()
-                .coarsen(longitude=coarsen)
+                .coarsen(longitude=coarsen, boundary="pad")
                 .mean()
             )
         # data = np.stack(
