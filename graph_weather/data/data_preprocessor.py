@@ -7,12 +7,9 @@ import sys
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-coarsen = sys.argv[1] # change this in train_small too if changed here
+coarsen = int(sys.argv[1]) # change this in train_small too if changed here
 train = True if sys.argv[2] == 'train' else False # set to true if normalising UK training data, set to false otherwise
 region = sys.argv[3] # choose from 'uk', 'europe', or 'global'
-
-print(coarsen, train, region)
-exit()
 
 datasets = []
 months = ['01', '04', '07', '10']
@@ -66,7 +63,7 @@ if train and region == 'uk':
     print(f'variances are {list(variances)}\n\n')
     print(f'stdevs are {list(stdevs)}\n\n')
 
-else: # below values generated based on UK data for months 1, 4, 7 and 10 in 2022
+else: # below values generated based on UK data for months 1, 4, 7 and 10 in 2022 at coarsen=1
     means = [3.0166762157579455e-06, 3.9560930879360215e-06, 3.8351314814273384e-05, 0.0003396595888137118, 0.0012867776079310803, 
              0.003833464493499311, 0.006286048431357801, 215.33928634354638, 217.76054517424703, 219.7321800302087, 241.1157702580787, 
              261.77968952403296, 276.3531956476422, 283.3917086280774, 8.895224371150183, 14.194233130727183, 17.267192941886787, 
