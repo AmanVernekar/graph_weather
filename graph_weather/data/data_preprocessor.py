@@ -1,14 +1,18 @@
 import glob
 import xarray as xr
 import numpy as np
+import sys
 
 # import pandas as pd
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-coarsen = 8 # change this in train_small too if changed here
-train = True # set to true if normalising UK training data, set to false otherwise
-region = 'global' # choose from 'uk', 'europe', or 'global'
+coarsen = sys.argv[1] # change this in train_small too if changed here
+train = True if sys.argv[2] == 'train' else False # set to true if normalising UK training data, set to false otherwise
+region = sys.argv[3] # choose from 'uk', 'europe', or 'global'
+
+print(coarsen, train, region)
+exit()
 
 datasets = []
 months = ['01', '04', '07', '10']
