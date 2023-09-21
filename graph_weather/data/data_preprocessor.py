@@ -58,9 +58,9 @@ if train and region == 'uk':
     variances = np.mean(variances, axis=0)
     stdevs = np.sqrt(variances)
 
-    print(f'means are {means}\n\n')
-    print(f'variances are {variances}\n\n')
-    print(f'stdevs are {stdevs}\n\n')
+    print(f'means are {list(means)}\n\n')
+    print(f'variances are {list(variances)}\n\n')
+    print(f'stdevs are {list(stdevs)}\n\n')
 
 else:
     means = [2.80617824e-06, 5.43949892e-06, 5.89384711e-05, 4.05640756e-04,
