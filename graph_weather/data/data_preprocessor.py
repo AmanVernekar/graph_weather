@@ -7,13 +7,14 @@ import numpy as np
 # from . import const
 
 coarsen = 1 # change this in train_small too if changed here
-train = True
+train = True # set to true if normalising UK training data, set to false otherwise
+region = 'uk' # choose from 'uk', 'europe', or 'global'
 
 datasets = []
 months = ['01', '04', '07', '10']
 
 for month in months:
-    filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/uk_2022/2022_{month}*")
+    filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/final/{region}/{region}_2022/2022_{month}*")
     filepaths = sorted(filepaths)
 
     for i, f in enumerate(filepaths):
@@ -46,7 +47,7 @@ for month in months:
         dataset[i] = data
     datasets.append(dataset)
 
-if train:
+if train and region == 'uk':
     datasets_np = np.concatenate(datasets, axis=0)
 
     means = np.mean(datasets_np, axis=0)
@@ -101,7 +102,9 @@ else:
 for i, dataset in enumerate(datasets):
     new = (dataset - means)/stdevs
     month = months[i]
-    np.save(f'/local/scratch-2/asv34/graph_weather/dataset/uk_2022_{month}_normed.npy', new) # change dataset back to new
+    np.save(f'/local/scratch-2/asv34/graph_weather/dataset/final/{region}/{region}_2022_{month}_normed.npy', new)
+
+
 
 
 
