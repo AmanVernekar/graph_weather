@@ -6,9 +6,9 @@ import numpy as np
 # from pysolar.util import extraterrestrial_irrad
 # from . import const
 
-coarsen = 4 # change this in train_small too if changed here
+coarsen = 8 # change this in train_small too if changed here
 train = True # set to true if normalising UK training data, set to false otherwise
-region = 'europe' # choose from 'uk', 'europe', or 'global'
+region = 'global' # choose from 'uk', 'europe', or 'global'
 
 datasets = []
 months = ['01', '04', '07', '10']
