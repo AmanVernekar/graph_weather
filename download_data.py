@@ -8,7 +8,7 @@ c = cdsapi.Client()
 uk_area = [63, -10, 47, 4]
 europe_area = [82, -38, 28, 32]
 
-train_months = [1, 4, 7, 10]
+train_months = [7] #[1, 4, 7, 10]
 test_months = [3, 6, 9, 12]
 years = [2022]
 times = ['00:00', '06:00', '12:00', '18:00']
@@ -24,7 +24,7 @@ elif region == 'europe':
 
 for year in years:
     for month in months:
-        for day in range(1,32):
+        for day in [31]:#range(1,32):
             for time in times:
                 try:
                     c.retrieve(
