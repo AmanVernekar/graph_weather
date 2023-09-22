@@ -42,7 +42,7 @@ for year in years:
                             'month': str(month).zfill(2),
                             'day': str(day).zfill(2),
                             'time': time,
-                            'area': area,
+                            # 'area': area,
                             'format': 'netcdf',
                         },
                         f'/local/scratch-2/asv34/graph_weather/dataset/final/{region}/{region}_{year}/download_air.nc')
