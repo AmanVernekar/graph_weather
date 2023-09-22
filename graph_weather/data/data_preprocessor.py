@@ -47,6 +47,8 @@ if not (train and region == 'uk'):
     
     elif uk_coarsen == 8:
         pass
+else:
+    skip = False
 
 for month in months:
     filepaths = glob.glob(f"/local/scratch-2/asv34/graph_weather/dataset/final/{region}/{region}_2022/2022_{month}*")
