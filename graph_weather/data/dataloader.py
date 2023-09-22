@@ -55,6 +55,9 @@ class MultiResoDataset(Dataset):
         self.global_dataset = torch.from_numpy(np.load(np_files[0]))
         self.europe_dataset = torch.from_numpy(np.load(np_files[1]))
         self.uk_dataset = torch.from_numpy(np.load(np_files[2]))
+        print(self.global_dataset.shape[0])
+        print(self.europe_dataset.shape[0])
+        print(self.uk_dataset.shape[0])
         assert self.global_dataset.shape[0] == self.europe_dataset.shape[0] == self.uk_dataset.shape[0]
 
         self.global_gap = global_gap
