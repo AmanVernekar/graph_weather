@@ -15,7 +15,7 @@ times = ['00:00', '06:00', '12:00', '18:00']
 
 region = sys.argv[1]
 months = train_months if sys.argv[2] == 'train' else test_months
-months = train_months.extend(test_months)
+months = [1,3,4,6,7,9,10,12]
 
 if region == 'uk':
     area = uk_area

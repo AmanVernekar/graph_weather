@@ -16,7 +16,7 @@ datasets = []
 train_months = ['01', '04', '07', '10']
 test_months = ['03', '06', '09', '12']
 months = train_months if train else test_months
-months = train_months.extend(test_months)
+months = [str(i).zfill(2) for i in  [1,3,4,6,7,9,10,12]]
 
 if not (train and region == 'uk'):
     skip = True
