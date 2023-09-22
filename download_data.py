@@ -15,6 +15,7 @@ times = ['00:00', '06:00', '12:00', '18:00']
 
 region = sys.argv[1]
 months = train_months if sys.argv[2] == 'train' else test_months
+months = train_months.extend(test_months)
 
 if region == 'uk':
     area = uk_area
@@ -24,7 +25,7 @@ elif region == 'europe':
 
 for year in years:
     for month in months:
-        for day in range(1,32):
+        for day in [31]:#range(1,32):
             for time in times:
                 try:
                     c.retrieve(
