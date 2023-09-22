@@ -1,2 +1,2 @@
 """Dataloaders and data processing utilities"""
-from .dataloader import AnalysisDataset, ParallelDataset
+from .dataloader import AnalysisDataset, ParallelDataset, MultiResoDataset
