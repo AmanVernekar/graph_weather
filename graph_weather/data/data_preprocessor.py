@@ -13,7 +13,7 @@ region = sys.argv[3] # choose from 'uk', 'europe', or 'global'
 uk_coarsen = int(sys.argv[4])
 
 datasets = []
-train_months = ['01', '04', '07', '10']
+train_months = ['07'] #['01', '04', '07', '10']
 test_months = ['03', '06', '09', '12']
 months = train_months if train else test_months
 
