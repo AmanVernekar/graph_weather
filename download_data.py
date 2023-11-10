@@ -25,7 +25,7 @@ elif region == 'europe':
 
 for year in years:
     for month in months:
-        for day in [31]:#range(1,32):
+        for day in range(1,32):
             for time in times:
                 try:
                     c.retrieve(
