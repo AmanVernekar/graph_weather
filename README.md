@@ -2,11 +2,9 @@
 
 Please also refer to original README [here](https://github.com/openclimatefix/graph_weather/blob/main/README.md).
 
-A nice README describing what you did, what the code does, any outstanding shortcomings/issues/"to do"s etc. would be very helpful.
-
 ### Description of selected files and folders (including those only present in idun:/local/scratch-2/asv34/graph_weather)
 
-I've included comments only for files that I've created/edited myself.
+I've mostly included comments only for files that I've created/edited myself.
 
  - consts.txt - means, standard deviations and variances for all 42 variables across space and time of global training data (months 1, 4, 7, 10 in 2022) - use this to normalise global data while testing most of the models
  - uk_consts.txt - means, standard deviations and variances for all 42 variables across space and time of UK training data (months 1, 4, 7, 10 in 2022) - use this to normalise UK data while testing regional models
